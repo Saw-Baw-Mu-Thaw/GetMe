@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Activities.ChoosePickupActivity">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:id="@+id/rtrp3x11nf9i"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@drawable/home_scroll_bg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="#F9FAFB"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="match_parent"
+                        android:layout_marginBottom="17dp"
+                        android:background="#FFFFFF"
+                        android:orientation="vertical">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="12dp"
+                            android:background="#FFFFFF"
+                            android:elevation="2dp"
+                            android:orientation="vertical">
+
+                            <LinearLayout
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="20dp"
+                                android:layout_marginTop="40dp"
+                                android:layout_marginBottom="33dp"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <LinearLayout
+                                    android:id="@+id/pickupBackLinlay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="17dp"
+                                    android:background="@drawable/cust_back_btn_bg"
+                                    android:clickable="true"
+                                    android:focusable="true"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="12dp"
+                                    android:paddingVertical="10dp">
+
+                                    <ImageView
+                                        android:layout_width="15dp"
+                                        android:layout_height="18dp"
+                                        android:scaleType="fitXY"
+                                        android:src="@drawable/arrow_back_24px" />
+                                </LinearLayout>
+
+                                <TextView
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:text="Pick-up Location"
+                                    android:textSize="23sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginHorizontal="48dp"
+                                android:layout_marginBottom="11dp"
+                                android:background="@drawable/cust_back_btn_bg"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal">
+
+                                <ImageView
+                                    android:layout_width="16dp"
+                                    android:layout_height="16dp"
+                                    android:layout_marginStart="14dp"
+                                    android:layout_marginEnd="18dp"
+                                    android:scaleType="fitXY"
+                                    android:src="@drawable/search" />
+
+                                <EditText
+                                    android:id="@+id/pickupSearchEditText"
+                                    android:layout_width="0dp"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginEnd="4dp"
+                                    android:layout_weight="1"
+                                    android:background="@null"
+                                    android:hint="Search location"
+                                    android:inputType="text"
+                                    android:paddingVertical="18dp"
+                                    android:textColor="#ADAEBC"
+                                    android:textSize="16sp" />
+                            </LinearLayout>
+                        </LinearLayout>
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:layout_marginBottom="24dp"
+                                android:background="#FFFFFF"
+                                android:gravity="center_vertical"
+                                android:orientation="horizontal"
+                                android:paddingHorizontal="20dp"
+                                android:paddingVertical="28dp"
+                                tools:ignore="MissingConstraints">
+
+                                <LinearLayout
+                                    android:id="@+id/pickupCurrLocLinlay"
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:background="@drawable/curr_location_bg"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="13dp"
+                                        android:background="@drawable/curr_location_icon_bg"
+                                        android:clickable="true"
+                                        android:focusable="true"
+                                        android:orientation="vertical"
+                                        android:paddingHorizontal="13dp"
+                                        android:paddingVertical="12dp">
+
+                                        <ImageView
+                                            android:layout_width="18dp"
+                                            android:layout_height="18dp"
+                                            android:scaleType="fitXY"
+                                            android:src="@drawable/my_location_24px" />
+                                    </LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="97dp"
+                                        android:orientation="vertical">
+
+                                        <TextView
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:layout_marginEnd="12dp"
+                                            android:layout_marginBottom="10dp"
+                                            android:text="Use current location"
+                                            android:textColor="#111827"
+                                            android:textSize="14sp"
+                                            android:textStyle="bold" />
+
+                                        <TextView
+                                            android:id="@+id/pickupCurrLocAddress"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="KTX tdtu, District 7, HCMC"
+                                            android:textColor="#6B7280"
+                                            android:textSize="12sp" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </LinearLayout>
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginStart="21dp"
+                            android:layout_marginBottom="37dp"
+                            android:text="Search Results"
+                            android:textColor="#111827"
+                            android:textSize="14sp"
+                            android:textStyle="bold" />
+
+                        <androidx.recyclerview.widget.RecyclerView
+                            android:id="@+id/pickupSearchRecyclerView"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_weight="0"/>
+
+                        <org.osmdroid.views.MapView
+                            android:id="@+id/pickupMapView"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:minHeight="185dp"
+                            android:layout_weight="1"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
