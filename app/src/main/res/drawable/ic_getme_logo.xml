@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item>
+        <shape android:shape="rectangle">
+            <solid android:color="#5865F2" />
+            <corners android:radius="18dp" />
+        </shape>
+    </item>
+
+    <item
+        android:left="12dp"
+        android:right="12dp"
+        android:top="12dp"
+        android:bottom="12dp">
+        <bitmap
+            android:src="@drawable/standard_car"
+            android:tint="#FFFFFF"
+            android:tintMode="src_in"
+            android:gravity="center" />
+    </item>
+
+</layer-list>
