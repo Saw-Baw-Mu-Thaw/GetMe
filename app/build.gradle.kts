@@ -39,6 +39,8 @@ dependencies {
     implementation(libs.constraintlayout)
     implementation(libs.volley)
     implementation("com.google.code.gson:gson:2.13.2")
+    implementation("com.github.MKergall:osmbonuspack:6.9.0")
+    implementation(libs.play.services.location)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

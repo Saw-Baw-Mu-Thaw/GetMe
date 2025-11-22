@@ -1,6 +1,8 @@
 package com.android.getme.Activities;
 
+import android.content.Intent;
 import android.os.Bundle;
+import android.widget.LinearLayout;
 
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
@@ -12,6 +14,8 @@ import com.android.getme.R;
 
 public class MainActivity extends AppCompatActivity {
 
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -22,5 +26,9 @@ public class MainActivity extends AppCompatActivity {
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
+
+        Intent intent = new Intent(this, HomeScreenActivity.class);
+        intent.putExtra("id", 1);
+        startActivity(intent);
     }
 }
