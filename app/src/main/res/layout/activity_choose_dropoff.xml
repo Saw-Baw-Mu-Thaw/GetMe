@@ -1,0 +1,280 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#FFFFFF"
+        android:orientation="vertical">
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:background="@drawable/ongoing_scroll_bg">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:orientation="vertical">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="#F9FAFB"
+                    android:orientation="vertical">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="#FFFFFF"
+                        android:elevation="2dp"
+                        android:orientation="vertical"
+                        android:paddingLeft="20dp"
+                        android:paddingTop="34dp"
+                        android:paddingBottom="24dp">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:layout_marginHorizontal="8dp"
+                            android:orientation="horizontal">
+
+                            <LinearLayout
+                                android:id="@+id/dropoffBackLinlay"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/cust_back_btn_bg"
+                                android:orientation="vertical"
+                                android:paddingVertical="5dp">
+
+                                <ImageView
+                                    android:layout_width="29dp"
+                                    android:layout_height="29dp"
+                                    android:scaleType="fitXY"
+                                    android:src="@drawable/arrow_back_24px" />
+                            </LinearLayout>
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginTop="9dp"
+                                android:text="Where to?"
+                                android:textColor="#111827"
+                                android:textSize="18sp"
+                                android:textStyle="bold" />
+
+                            <View
+                                android:layout_width="0dp"
+                                android:layout_height="0dp"
+                                android:layout_weight="1" />
+
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="10dp"
+                        android:orientation="vertical">
+
+                        <androidx.constraintlayout.widget.ConstraintLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content">
+
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:background="#FFFFFF"
+                                android:orientation="vertical"
+                                android:paddingHorizontal="42dp"
+                                android:paddingBottom="33dp"
+                                tools:ignore="MissingConstraints">
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="16dp"
+                                    android:orientation="vertical"
+                                    android:paddingVertical="3dp">
+
+                                    <TextView
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="25dp"
+                                        android:layout_marginBottom="4dp"
+                                        android:text="From"
+                                        android:textColor="#6B7280"
+                                        android:textSize="14sp" />
+
+                                    <LinearLayout
+                                        android:layout_width="match_parent"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginBottom="4dp"
+                                        android:gravity="center_vertical"
+                                        android:orientation="horizontal">
+
+                                        <LinearLayout
+                                            android:layout_width="12dp"
+                                            android:layout_height="12dp"
+                                            android:layout_marginEnd="12dp"
+                                            android:background="@drawable/current_location_dot"
+                                            android:orientation="vertical"></LinearLayout>
+
+                                        <TextView
+                                            android:id="@+id/pickupNameTextView"
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:text="Current Location"
+                                            android:textColor="#111827"
+                                            android:textSize="16sp" />
+
+                                        <LinearLayout
+                                            android:layout_width="0dp"
+                                            android:layout_height="match_parent"
+                                            android:layout_weight="1"
+                                            android:orientation="vertical"></LinearLayout>
+
+                                        <LinearLayout
+                                            android:layout_width="wrap_content"
+                                            android:layout_height="wrap_content"
+                                            android:orientation="vertical"
+                                            android:paddingVertical="4dp">
+
+                                            <ImageView
+                                                android:layout_width="16dp"
+                                                android:layout_height="16dp"
+                                                android:scaleType="fitXY"
+                                                android:src="@drawable/my_location_24px" />
+                                        </LinearLayout>
+                                    </LinearLayout>
+
+                                    <TextView
+                                        android:id="@+id/pickupAddressTextView"
+                                        android:layout_width="wrap_content"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginStart="24dp"
+                                        android:text="123 Main Street, Downtown"
+                                        android:textColor="#9CA3AF"
+                                        android:textSize="14sp" />
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="wrap_content"
+                                    android:layout_height="wrap_content"
+                                    android:layout_marginBottom="16dp"
+                                    android:orientation="vertical"
+                                    android:paddingHorizontal="11dp">
+
+                                    <LinearLayout
+                                        android:layout_width="1dp"
+                                        android:layout_height="24dp"
+                                        android:orientation="vertical"></LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="1dp"
+                                        android:layout_height="24dp"
+                                        android:background="#D1D5DB"
+                                        android:orientation="vertical"></LinearLayout>
+                                </LinearLayout>
+
+                                <LinearLayout
+                                    android:layout_width="match_parent"
+                                    android:layout_height="wrap_content"
+                                    android:gravity="center_vertical"
+                                    android:orientation="horizontal">
+
+                                    <LinearLayout
+                                        android:layout_width="17dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_marginEnd="12dp"
+                                        android:background="@drawable/ongoing_to_dot"
+                                        android:orientation="vertical"></LinearLayout>
+
+                                    <LinearLayout
+                                        android:layout_width="0dp"
+                                        android:layout_height="wrap_content"
+                                        android:layout_weight="1"
+                                        android:orientation="vertical"
+                                        android:paddingVertical="4dp">
+
+                                        <EditText
+                                            android:id="@+id/dropoffNameTextView"
+                                            android:layout_width="match_parent"
+                                            android:layout_height="wrap_content"
+                                            android:background="@null"
+                                            android:hint="Where would you like to go?"
+                                            android:inputType="text"
+                                            android:textColor="#ADAEBC"
+                                            android:textSize="16sp" />
+                                    </LinearLayout>
+                                </LinearLayout>
+                            </LinearLayout>
+
+                            <View
+                                android:id="@+id/view"
+                                android:layout_width="0dp"
+                                android:layout_height="1dp"
+                                android:background="#F3F4F6"
+                                app:layout_constraintBottom_toBottomOf="parent"
+                                app:layout_constraintEnd_toEndOf="parent"
+                                app:layout_constraintStart_toStartOf="parent" />
+                        </androidx.constraintlayout.widget.ConstraintLayout>
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="320dp"
+                            android:minHeight="160dp"
+                            android:orientation="vertical">
+
+                            <androidx.recyclerview.widget.RecyclerView
+                                android:id="@+id/dropoffResultsRecyclerView"
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                app:layout_constraintTop_toBottomOf="@+id/view" />
+
+                            <org.osmdroid.views.MapView
+                                android:id="@+id/dropoffMap"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:id="@+id/setDestinationLinlay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginHorizontal="42dp"
+                        android:layout_marginBottom="16dp"
+                        android:background="@drawable/destination_button_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:gravity="center_horizontal"
+                        android:orientation="vertical"
+                        android:paddingVertical="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Set destination on map"
+                            android:textColor="#FFFFFF"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
+

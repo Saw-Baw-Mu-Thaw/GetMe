@@ -1,0 +1,355 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".Fragments.HomeScreenFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:background="@drawable/home_scroll_bg"
+        android:paddingBottom="8dp">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:background="#F9FAFB"
+                android:orientation="vertical"
+                android:paddingBottom="32dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="31dp"
+                    android:background="@drawable/home_linlay_bg"
+                    android:orientation="vertical"
+                    android:paddingRight="12dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginTop="54dp"
+                        android:layout_marginBottom="16dp"
+                        android:text="SmartRide"
+                        android:textColor="#FFFFFF"
+                        android:textSize="24sp"
+                        android:textStyle="bold" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginBottom="26dp"
+                        android:text="Where to today?"
+                        android:textColor="#DBEAFE"
+                        android:textSize="14sp" />
+
+                    <LinearLayout
+                        android:id="@+id/searchRideLinLay"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:layout_marginBottom="32dp"
+                        android:background="@drawable/home_scroll_bg"
+                        android:elevation="15dp"
+                        android:orientation="horizontal"
+                        android:paddingHorizontal="16dp"
+                        android:paddingVertical="20dp">
+
+                        <ImageView
+                            android:layout_width="18dp"
+                            android:layout_height="18dp"
+                            android:layout_marginEnd="12dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/search" />
+
+                        <LinearLayout
+                            android:id="@+id/rymmsd4z695q"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:background="#FFFFFF"
+                            android:orientation="vertical"
+                            android:paddingVertical="3dp"
+                            android:layout_weight="1">
+
+                            <TextView
+                                android:id="@+id/bookRideTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Where would you like to go?"
+                                android:textColor="#ADAEBC"
+                                android:textSize="14sp" />
+                        </LinearLayout>
+
+                        <ImageView
+                            android:layout_width="13dp"
+                            android:layout_height="18dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/location" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="48dp"
+                    android:layout_marginBottom="23dp"
+                    android:text="Choose Your Ride"
+                    android:textColor="#1F2937"
+                    android:textSize="18sp"
+                    android:textStyle="bold" />
+
+                <LinearLayout
+                    android:id="@+id/rideStandardLinlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="48dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/home_ride_otp_bg"
+                    android:elevation="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="18dp"
+                    android:paddingLeft="18dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/home_ride_otp_std_img_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <ImageView
+                            android:layout_width="24dp"
+                            android:layout_height="24dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/standard_car" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginEnd="15dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/rzw29b2trel"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="17dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Standard"
+                            android:textColor="#1F2937"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/rxlz8nyhtz8"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Budget friendly"
+                            android:textColor="#6B7280"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/rideEconomyLinlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="48dp"
+                    android:layout_marginBottom="12dp"
+                    android:background="@drawable/home_ride_otp_bg"
+                    android:elevation="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="18dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginEnd="16dp"
+                        android:background="@drawable/home_ride_otp_eco_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="13dp"
+                        android:paddingVertical="16dp">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="24dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/economy_car" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="17dp"
+                            android:layout_marginBottom="6dp"
+                            android:text="Economy"
+                            android:textColor="#1F2937"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="comfortable rides"
+                            android:textColor="#6B7280"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:id="@+id/rideBikeLinlay"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginHorizontal="48dp"
+                    android:layout_marginBottom="57dp"
+                    android:background="@drawable/home_ride_otp_bg"
+                    android:elevation="2dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="18dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="18dp"
+                        android:layout_marginEnd="17dp"
+                        android:background="@drawable/home_ride_otp_bike_bg"
+                        android:clickable="true"
+                        android:focusable="true"
+                        android:orientation="vertical"
+                        android:paddingHorizontal="13dp"
+                        android:paddingVertical="16dp">
+
+                        <ImageView
+                            android:layout_width="30dp"
+                            android:layout_height="24dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/bike" />
+                    </LinearLayout>
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="62dp"
+                            android:layout_marginBottom="9dp"
+                            android:text="Bike"
+                            android:textColor="#1F2937"
+                            android:textSize="16sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Fast &amp; affordable"
+                            android:textColor="#6B7280"
+                            android:textSize="12sp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="29dp"
+                    android:layout_marginEnd="15dp"
+                    android:background="@drawable/home_gift_bg"
+                    android:elevation="15dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal"
+                    android:paddingVertical="24dp">
+
+                    <LinearLayout
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="24dp"
+                        android:orientation="vertical"
+                        android:paddingTop="7dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="22dp"
+                            android:layout_marginBottom="15dp"
+                            android:text="Get 50% OFF"
+                            android:textColor="#FFFFFF"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginBottom="14dp"
+                            android:text="On your first 3 rides!"
+                            android:textColor="#FFFFFF"
+                            android:textSize="14sp" />
+
+                        <LinearLayout
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginEnd="31dp"
+                            android:background="@drawable/home_gift_text_bg"
+                            android:clickable="true"
+                            android:focusable="true"
+                            android:orientation="vertical"
+                            android:paddingHorizontal="17dp"
+                            android:paddingVertical="12dp">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Claim Now"
+                                android:textColor="#9333EA"
+                                android:textSize="14sp"
+                                android:textStyle="bold" />
+                        </LinearLayout>
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="0dp"
+                        android:layout_height="0dp"
+                        android:layout_weight="1" />
+
+                    <ImageView
+                        android:layout_width="48dp"
+                        android:layout_height="48dp"
+                        android:layout_marginEnd="38dp"
+                        android:scaleType="fitXY"
+                        android:src="@drawable/featured_seasonal_and_gifts_24px" />
+                </LinearLayout>
+            </LinearLayout>
+
+
+        </LinearLayout>
+    </ScrollView>
+
+
+
+</FrameLayout>

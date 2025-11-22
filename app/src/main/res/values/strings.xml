@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">GetMe</string>
     <string name="register"><u>Register</u></string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="GetMe_OSM_User_Agent">GetMe/1.0 (contact:thawthibaw@gmail.com)</string>
+    <string name="GH_key">52fe4602-7929-441a-929c-b336642ee47e</string>
 </resources>
