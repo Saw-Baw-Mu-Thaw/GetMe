@@ -46,6 +46,12 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity
+            android:name=".Activities.RegisterDriverActivity"
+            android:exported="false" />
+        <activity
+            android:name=".Activities.RegisterUserActivity"
+            android:exported="false" />
     </application>
 
 </manifest>
