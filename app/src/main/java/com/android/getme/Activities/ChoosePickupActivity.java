@@ -104,6 +104,15 @@ implements PickupSearchListener {
                             Bundle b = result.getData().getExtras();
                             if(b != null) {
                                 Intent intent = new Intent();
+                                String status = b.getString("status");
+                                intent.putExtra("status", status);
+
+                                if(status.equals("Cancelled")) {
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+                                }
+                                // TODO : check if status is cancelled
+
                                 int rideId = b.getInt("rideId");
                                 int driverId = b.getInt("driverId");
                                 intent.putExtra("rideId", rideId);

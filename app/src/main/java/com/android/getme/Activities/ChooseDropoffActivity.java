@@ -76,6 +76,15 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
                         Bundle b = result.getData().getExtras();
                         if(b != null) {
                             Intent intent = new Intent();
+                            String status = b.getString("status");
+                            // TODO : check if status is cancelled
+                            intent.putExtra("status", status);
+
+                            if(status.equals("Cancelled")) {
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
+
                             int rideId = b.getInt("rideId");
                             int driverId = b.getInt("driverId");
                             intent.putExtra("rideId", rideId);
@@ -88,6 +97,7 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
                             double distance = b.getDouble("distance");
                             intent.putExtra("distance", distance);
                             intent.putExtra("duration", duration);
+
 
                             intent.putExtra("dropoffLat", viewModel.dropoffLocation.getLatitude());
                             intent.putExtra("dropoffLng", viewModel.dropoffLocation.getLongitude());

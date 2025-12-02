@@ -62,10 +62,21 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                         Bundle b = result.getData().getExtras();
                         if(b != null) {
                             Intent intent = new Intent();
+
+                            String status = b.getString("status");
+                            intent.putExtra("status", status);
+                            // TODO : check status is cancelled
+                            if(status.equals("Cancelled")) {
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
+
                             int rideId = b.getInt("rideId");
                             int driverId = b.getInt("driverId");
+
                             intent.putExtra("rideId", rideId);
                             intent.putExtra("driverId", driverId);
+
                             intent.putExtra("payment", viewModel.payment);
                             intent.putExtra("amount", viewModel.amount);
                             intent.putExtra("distance", viewModel.distance);
@@ -93,7 +104,7 @@ public class ChooseVehicleActivity extends AppCompatActivity {
 
         setPrice();
 
-        setChoice();
+//        setChoice();
 
         initializeListeners();
     }
@@ -219,6 +230,8 @@ public class ChooseVehicleActivity extends AppCompatActivity {
 
                 viewModel.duration = ((int)duration) / 60; // we save in minutes
                 viewModel.distance = distance;
+
+                setChoice();
                 super.handleMessage(msg);
             }
         };

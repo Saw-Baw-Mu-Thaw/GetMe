@@ -35,6 +35,38 @@ public class HomeScreenActivity extends AppCompatActivity implements
     LinearLayout profileScreenLinlay;
     CustRideViewModel custRideViewModel;
 
+    ActivityResultLauncher<Intent> launchTrackRideForResult = registerForActivityResult(
+            new ActivityResultContracts.StartActivityForResult(),
+            new ActivityResultCallback<ActivityResult>() {
+                @Override
+                public void onActivityResult(ActivityResult o) {
+                    if(o.getResultCode() == RESULT_OK && o.getData() != null) {
+
+                        String status = o.getData().getStringExtra("status");
+                        if(status.equals("Cancelled") || status.equals("Completed")) {
+                            unpopulateViewModel();
+                        }
+
+                    }
+                }
+            }
+    );
+
+    private void unpopulateViewModel() {
+        custRideViewModel.status = null;
+        custRideViewModel.rideId = 0;
+        custRideViewModel.driverId = 0;
+        custRideViewModel.vehicleType = null;
+        custRideViewModel.amount = 0;
+        custRideViewModel.payment = null;
+        custRideViewModel.pickup = null;
+        custRideViewModel.locationFrom = null;
+        custRideViewModel.locationTo = null;
+        custRideViewModel.dropoff = null;
+        custRideViewModel.distance = 0.0;
+        custRideViewModel.duration = 0;
+    }
+
     ActivityResultLauncher<Intent> startForResult = registerForActivityResult(
             new ActivityResultContracts.StartActivityForResult(),
             new ActivityResultCallback<ActivityResult>() {
@@ -43,39 +75,67 @@ public class HomeScreenActivity extends AppCompatActivity implements
                     if(result.getResultCode() == RESULT_OK) {
                         Bundle b = result.getData().getExtras();
                         if(b != null) {
-                            int rideId = b.getInt("rideId");
-                            int driverId = b.getInt("driverId");
-                            String payment = b.getString("payment");
-                            int amount = b.getInt("amount");
-                            int duration = b.getInt("duration");
-                            double distance = b.getDouble("distance");
-                            custRideViewModel.amount = amount;
-                            custRideViewModel.duration = duration;
-                            custRideViewModel.distance = distance;
-                            custRideViewModel.payment = payment;
-                            custRideViewModel.rideId = rideId;
-                            custRideViewModel.driverId = driverId;
 
-
-                            double dropoffLat = b.getDouble("dropoffLat");
-                            double dropoffLng = b.getDouble("dropoffLng");
-                            String dropoffName = b.getString("dropoffName");
-                            custRideViewModel.dropoff = new GeoPoint(dropoffLat, dropoffLng);
-                            custRideViewModel.locationTo = dropoffName;
-
-                            double pickupLat = b.getDouble("pickupLat");
-                            double pickupLng = b.getDouble("pickupLng");
-                            String pickupName = b.getString("pickupName");
-                            custRideViewModel.pickup = new GeoPoint(pickupLat, pickupLng);
-                            custRideViewModel.locationFrom = pickupName;
-
-                            showToast("RideID: " + custRideViewModel.rideId + "\nDriverID: " + custRideViewModel.driverId);
-                            // TODO : start track ride activity
+                            String status = b.getString("status");
+                            if(status.equals("Cancelled")) {
+                                unpopulateViewModel();
+                            }else{
+                                populateViewModelWithResult(b);
+                                startTrackRide();
+                            }
                         }
                     }
                 }
             }
     );
+
+    private void populateViewModelWithResult(Bundle b) {
+        int rideId = b.getInt("rideId");
+        int driverId = b.getInt("driverId");
+        String payment = b.getString("payment");
+        int amount = b.getInt("amount");
+        int duration = b.getInt("duration");
+        double distance = b.getDouble("distance");
+        custRideViewModel.amount = amount;
+        custRideViewModel.duration = duration;
+        custRideViewModel.distance = distance;
+        custRideViewModel.payment = payment;
+        custRideViewModel.rideId = rideId;
+        custRideViewModel.driverId = driverId;
+
+
+        double dropoffLat = b.getDouble("dropoffLat");
+        double dropoffLng = b.getDouble("dropoffLng");
+        String dropoffName = b.getString("dropoffName");
+        custRideViewModel.dropoff = new GeoPoint(dropoffLat, dropoffLng);
+        custRideViewModel.locationTo = dropoffName;
+
+        double pickupLat = b.getDouble("pickupLat");
+        double pickupLng = b.getDouble("pickupLng");
+        String pickupName = b.getString("pickupName");
+        custRideViewModel.pickup = new GeoPoint(pickupLat, pickupLng);
+        custRideViewModel.locationFrom = pickupName;
+
+        custRideViewModel.status = "Waiting";
+    }
+
+    private void startTrackRide() {
+        Intent intent = new Intent(HomeScreenActivity.this, TrackRideActivity.class);
+        intent.putExtra("pickupLat", custRideViewModel.pickup.getLatitude());
+        intent.putExtra("pickupLng", custRideViewModel.pickup.getLongitude());
+        intent.putExtra("locationFrom", custRideViewModel.locationFrom);
+        intent.putExtra("dropoffLat", custRideViewModel.dropoff.getLatitude());
+        intent.putExtra("dropoffLng", custRideViewModel.dropoff.getLongitude());
+        intent.putExtra("locationTo", custRideViewModel.locationTo);
+        intent.putExtra("status", custRideViewModel.status);
+        intent.putExtra("vehicleType", custRideViewModel.vehicleType);
+        intent.putExtra("distance", custRideViewModel.distance);
+        intent.putExtra("driverId", custRideViewModel.driverId);
+        intent.putExtra("payment", custRideViewModel.payment);
+        intent.putExtra("amount", custRideViewModel.amount);
+        intent.putExtra("rideId", custRideViewModel.rideId);
+        launchTrackRideForResult.launch(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
