@@ -109,7 +109,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="24dp"
-                        android:text="123 Main Street, Downtown"
+                        android:text="Loading.."
                         android:textColor="#9CA3AF"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -165,7 +165,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_marginStart="24dp"
-                        android:text="123 Main Street, Downtown"
+                        android:text="Loading.."
                         android:textColor="#9CA3AF"
                         android:textSize="14sp" />
                 </LinearLayout>
@@ -178,7 +178,7 @@
                 android:layout_marginVertical="5dp"
                 android:background="@drawable/home_scroll_bg"
                 android:orientation="vertical"
-                android:padding="10dp">
+                android:padding="13dp">
 
                 <TextView
                     android:layout_width="wrap_content"
@@ -240,7 +240,7 @@
                             android:id="@+id/economyPriceTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="$12.50"
+                            android:text="Loading.."
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -304,7 +304,7 @@
                             android:id="@+id/standardPriceTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="$15.80"
+                            android:text="Loading.."
                             android:textSize="15sp"
                             android:textStyle="bold" />
 
@@ -368,7 +368,7 @@
                             android:id="@+id/bikePriceTextView"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="$8.20"
+                            android:text="Loading.."
                             android:textSize="15sp"
                             android:textStyle="bold" />
 

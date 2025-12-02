@@ -175,7 +175,7 @@
                                             android:id="@+id/pickupCurrLocAddress"
                                             android:layout_width="wrap_content"
                                             android:layout_height="wrap_content"
-                                            android:text="KTX tdtu, District 7, HCMC"
+                                            android:text="Loading.."
                                             android:textColor="#6B7280"
                                             android:textSize="12sp" />
                                     </LinearLayout>
