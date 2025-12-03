@@ -21,13 +21,14 @@ import androidx.lifecycle.ViewModelProvider;
 import com.android.getme.Fragments.ActivityFragment;
 import com.android.getme.Fragments.HomeScreenFragment;
 import com.android.getme.Listeners.CustHomeFragListener;
+import com.android.getme.Listeners.OngoingRideListener;
 import com.android.getme.R;
 import com.android.getme.ViewModels.CustRideViewModel;
 
 import org.osmdroid.util.GeoPoint;
 
 public class HomeScreenActivity extends AppCompatActivity implements
-        CustHomeFragListener {
+        CustHomeFragListener, OngoingRideListener {
 
     LinearLayout homeScreenLinLay;
     LinearLayout activityScreenLinLay;
@@ -48,6 +49,10 @@ public class HomeScreenActivity extends AppCompatActivity implements
                         }
 
                     }
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.homeScreenFragContainer, new HomeScreenFragment())
+                            .commit();
                 }
             }
     );
@@ -181,7 +186,9 @@ public class HomeScreenActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.homeScreenFragContainer, new ActivityFragment()).commit();
+                        .replace(R.id.homeScreenFragContainer,
+                                ActivityFragment.newInstance(custRideViewModel.custId, custRideViewModel.vehicleType))
+                        .commit();
             }
         });
 
@@ -211,5 +218,11 @@ public class HomeScreenActivity extends AppCompatActivity implements
         intent.putExtra("vehicleType", vehicleType);
         intent.putExtra("custId", custRideViewModel.custId);
         startForResult.launch(intent);
+    }
+
+    @Override
+    public void ongoingRideClicked(String status) {
+        custRideViewModel.status = status;
+        startTrackRide();
     }
 }

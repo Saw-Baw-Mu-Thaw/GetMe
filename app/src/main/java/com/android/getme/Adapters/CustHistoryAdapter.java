@@ -12,20 +12,23 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.getme.Models.CustRideHistoryResult;
 import com.android.getme.Others.DummyData;
 import com.android.getme.R;
 import com.android.getme.ViewModels.CustHistoryViewModel;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
 public class CustHistoryAdapter extends RecyclerView.Adapter<CustHistoryAdapter.ViewHolder> {
 
-    List<DummyData.RideHistory> rideHistories;
+    List<CustRideHistoryResult> rideHistories;
     Context context;
 
-    public CustHistoryAdapter(Context context, List<DummyData.RideHistory> histories) {
+    public CustHistoryAdapter(Context context, List<CustRideHistoryResult> histories) {
         rideHistories = histories;
         this.context = context;
     }
@@ -40,7 +43,7 @@ public class CustHistoryAdapter extends RecyclerView.Adapter<CustHistoryAdapter.
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-        DummyData.RideHistory curr = rideHistories.get(position);
+        CustRideHistoryResult curr = rideHistories.get(position);
 
         if(curr.status.equals("Cancelled")) {
             holder.historyRideStatusImgView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.cancel_24px));
@@ -49,8 +52,11 @@ public class CustHistoryAdapter extends RecyclerView.Adapter<CustHistoryAdapter.
             holder.historyRideStatusImgView.setImageDrawable(AppCompatResources.getDrawable(context, R.drawable.check_circle_24px));
         }
         holder.historyRideStatusTextView.setText(curr.status);
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("LLL d, hh:mm a");
-        holder.historyRideDateTextView.setText(formatter.format(curr.date));
+
+        DateTimeFormatter formatter1 = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm:ss");
+        LocalDateTime localDateTime = LocalDateTime.parse(curr.date, formatter1);
+        DateTimeFormatter formatter2 = DateTimeFormatter.ofPattern("LLL d, hh:mm a");
+        holder.historyRideDateTextView.setText(localDateTime.format(formatter2));
 
         holder.historyFromTextView.setText(curr.LocationFrom);
         holder.historyToTextView.setText(curr.LocationTo);

@@ -54,15 +54,15 @@
                             android:clickable="true"
                             android:focusable="true"
                             android:orientation="vertical">
+
                             <TextView
                                 android:id="@+id/driverStatusTextView"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Driver En Route"
                                 android:textColor="#166534"
                                 android:textSize="12sp"
-                                android:textStyle="bold"
-                                android:layout_height="wrap_content"
-                                android:layout_width="wrap_content"
-                                android:text="Driver En Route"
-                                />
+                                android:textStyle="bold" />
                         </LinearLayout>
                     </LinearLayout>
                     <LinearLayout
@@ -99,7 +99,7 @@
                                 android:text="John Smith"
                                 />
                             <TextView
-                                android:id="@+id/MakeTextView"
+                                android:id="@+id/makeTextView"
                                 android:textColor="#4B5563"
                                 android:textSize="14sp"
                                 android:layout_marginBottom="9dp"
@@ -118,14 +118,10 @@
 
                                 <RatingBar
                                     android:id="@+id/ongoingRatingBar"
-                                    android:layout_width="wrap_content"
                                     android:layout_height="wrap_content"
-                                    android:layout_marginEnd="5dp"
-                                    android:scaleY="0.25"
-                                    android:scaleX="0.25"
+                                    android:layout_width="wrap_content"
                                     android:numStars="5"
-                                    android:rating="4"
-                                    android:layout_weight="1"/>
+                                    style="@style/driverRatingBar"/>
                                 <TextView
                                     android:id="@+id/ongoingRatingTextView"
                                     android:layout_width="wrap_content"
@@ -225,11 +221,12 @@
                     </androidx.constraintlayout.widget.ConstraintLayout>
                 </LinearLayout>
                 <LinearLayout
+                    android:id="@+id/ongoingDriverTimeLinlay"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:background="@drawable/ongoing_arrival_bg"
                     android:paddingVertical="20dp"
-                    android:layout_marginBottom="294dp"
+                    android:layout_marginBottom="10dp"
                     android:layout_marginHorizontal="46dp"
                     android:clipChildren="false"
                     android:clipToPadding="false"
@@ -285,6 +282,27 @@
                             />
                     </LinearLayout>
                 </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/noOngoingLinlay"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:background="@drawable/ongoing_scroll_bg"
+                android:padding="17dp"
+                android:layout_marginBottom="30dp"
+                android:layout_marginHorizontal="43dp"
+                android:elevation="6dp"
+                android:clipChildren="false"
+                android:clipToPadding="false">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="No Ongoing Rides"
+                    android:textStyle="bold"
+                    android:textSize="24sp"
+                    android:layout_gravity="center"/>
+            </LinearLayout>
 
         </LinearLayout>
     </ScrollView>

@@ -4,6 +4,7 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
@@ -14,10 +15,17 @@ import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.getme.R;
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.button.MaterialButton;
+import com.google.gson.JsonObject;
+
+import org.json.JSONObject;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
     MaterialButton btnLogin;
 
     boolean isUser = true;
-    String BASE_URL = "http://your.address";
+    String BASE_URL = "http://10.0.2.2:8000";
 
 
     @Override
@@ -100,7 +108,11 @@ public class MainActivity extends AppCompatActivity {
                     }
                 },
 
-                error -> Toast.makeText(this, "Invalid email or password", Toast.LENGTH_LONG).show()
+                error -> {
+                    Toast.makeText(this, "Invalid email or password", Toast.LENGTH_LONG).show();
+                    error.printStackTrace();
+                }
+
         ) {
             protected Map<String, String> getParams() {
                 Map<String, String> map = new HashMap<>();
@@ -108,9 +120,52 @@ public class MainActivity extends AppCompatActivity {
                 map.put("password", password);
                 return map;
             }
+
+            @Override
+            public Map<String, String> getHeaders() throws AuthFailureError {
+                Map<String, String> map = new HashMap<>();
+                map.put("Content-Type", "application/json");
+                return map;
+            }
         };
 
-        Volley.newRequestQueue(this).add(req);
+        JSONObject jsonBody = new JSONObject();
+        try{
+            jsonBody.put("email", email);
+            jsonBody.put("password", password);
+        }catch(Exception e) {
+            e.printStackTrace();
+        }
+
+        JsonObjectRequest jsonReq = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        try{
+                            int userId = jsonObject.getInt("custId");
+                            saveSession(userId);
+
+                            Toast.makeText(MainActivity.this, "Login Success", Toast.LENGTH_SHORT).show();
+
+                            if (isUser) {
+                                startActivity(new Intent(MainActivity.this, HomeScreenActivity.class).putExtra("id", 1));
+                            } else {
+                                // startActivity(new Intent(this, DriverHomeScreenActivty.class));
+                            }
+
+                        }catch (Exception e) {
+                            e.printStackTrace();
+                        }
+
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                volleyError.printStackTrace();
+            }
+        });
+
+        Volley.newRequestQueue(this).add(jsonReq);
     }
 
     private void saveSession(int userId) {

@@ -19,6 +19,9 @@ import com.google.android.material.tabs.TabLayoutMediator;
 
 public class ActivityFragment extends Fragment {
 
+    private int custId;
+    private String vehicleType;
+
     public ActivityFragment() {
         super();
     }
@@ -27,7 +30,19 @@ public class ActivityFragment extends Fragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        if(getArguments() != null) {
+            custId = getArguments().getInt("custId");
+            vehicleType = getArguments().getString("vehicleType");
+        }
+    }
 
+    public static ActivityFragment newInstance(int custId, String vehicleType) {
+        Bundle b = new Bundle();
+        b.putInt("custId", custId);
+        b.putString("vehicleType", vehicleType);
+        ActivityFragment fragment = new ActivityFragment();
+        fragment.setArguments(b);
+        return fragment;
     }
 
     @Override
@@ -49,7 +64,7 @@ public class ActivityFragment extends Fragment {
         tabLayout.addTab(tabLayout.newTab()); // tab for ongoing
         tabLayout.addTab(tabLayout.newTab()); // tab for history
 
-        final TabPageAdapter adapter = new TabPageAdapter(getActivity());
+        final TabPageAdapter adapter = new TabPageAdapter(getActivity(), custId, vehicleType);
         ViewPager2 viewPager2 = view.findViewById(R.id.view_pager);
         viewPager2.setAdapter(adapter);
 

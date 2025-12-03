@@ -138,7 +138,7 @@ public class FindDriverActivity extends AppCompatActivity{
             jsonObject.put("dropoffLat", String.format("%.3f",viewModel.dropoffLocation.getLatitude()));
             jsonObject.put("dropoffLong", String.format("%.3f", viewModel.dropoffLocation.getLongitude()));
             jsonObject.put("distance", String.format("%.1f", viewModel.distance));
-            jsonObject.put("duration", viewModel.duration);
+            jsonObject.put("duration", viewModel.duration/60);
             jsonObject.put("status", "Finding Driver");
         }catch (Exception e) {
             e.printStackTrace();
