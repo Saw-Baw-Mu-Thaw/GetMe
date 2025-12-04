@@ -245,6 +245,10 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
         }
         dropoffMarker = new Marker(map);
         dropoffMarker.setPosition(viewModel.dropoffLocation);
+        dropoffMarker.setTitle(name);
+        dropoffMarker.setSubDescription(address);
+        mapController.setCenter(new GeoPoint(lat,lng));
+        mapController.setZoom(15.0);
         map.getOverlays().add(dropoffMarker);
         map.invalidate();
         adapter.setSearchResults(new ArrayList<>());

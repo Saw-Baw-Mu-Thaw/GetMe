@@ -64,7 +64,7 @@ public class CustHistoryAdapter extends RecyclerView.Adapter<CustHistoryAdapter.
         String distance = curr.distance + " km";
         holder.historyDistance.setText(distance);
 
-        String amount = "$" + curr.amount;
+        String amount = curr.amount + " VND";
         holder.historyAmount.setText(amount);
     }
 
