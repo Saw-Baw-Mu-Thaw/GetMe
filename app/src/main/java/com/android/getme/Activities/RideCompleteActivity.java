@@ -1,5 +1,9 @@
 package com.android.getme.Activities;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
@@ -25,6 +29,8 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import java.util.concurrent.ConcurrentHashMap;
+
 public class RideCompleteActivity extends AppCompatActivity {
 
     private TextView rideCmpDriverNameTxt;
@@ -42,6 +48,9 @@ public class RideCompleteActivity extends AppCompatActivity {
     private int rideId;
 
     final private String ratingUrl = "http://10.0.2.2:8000/rating";
+
+    private NotificationManager manager;
+    final private int notificationId = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -108,6 +117,37 @@ public class RideCompleteActivity extends AppCompatActivity {
                 finish();
             }
         });
+
+        manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        createNotiChannel();
+
+        sendNotification();
+    }
+
+    private void createNotiChannel() {
+        String channelId = getPackageName();
+        String name = ActivityCompat.getString(this, R.string.channel_name);
+        String desc = ActivityCompat.getString(this, R.string.channel_desc);
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+        NotificationChannel channel = new NotificationChannel(channelId, name, importance);
+        channel.setDescription(desc);
+        channel.enableVibration(true);
+
+        manager.createNotificationChannel(channel);
+    }
+
+    private void sendNotification() {
+        String channelId = getPackageName();
+        Notification notification = new Notification.Builder(this, channelId)
+                .setContentTitle("Ride Completed Successfully")
+                .setContentText("You have arrived at your destination. We hope to see you again")
+                .setChannelId(channelId)
+                .setSmallIcon(R.drawable.ic_getme_logo)
+                .build();
+
+        manager.notify(notificationId, notification);
     }
 
     private void initializeComponents() {
@@ -128,6 +168,7 @@ public class RideCompleteActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         setResult(RESULT_OK);
+        finish();
         super.onDestroy();
     }
 }

@@ -1,5 +1,9 @@
 package com.android.getme.Activities;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
@@ -7,6 +11,7 @@ import android.os.Looper;
 import android.os.Message;
 import android.service.voice.VoiceInteractionSession;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -80,10 +85,13 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
     private WebSocket webSocket;
     final private String BASEURL = "http://10.0.2.2:8000";
     final private String WSURL = "ws://10.0.2.2:8000/ws";
+    private NotificationManager manager;
+    final private int notificationId = 101;
 
     private Handler ArrivalHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
+            sendNotification();
             loadAnimatedMap();
         }
     };
@@ -111,6 +119,10 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
 
         mViewModel = new ViewModelProvider(this).get(CustRideViewModel.class);
 
+        manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        createChannel();
+
         populateViewModel();
 
         initializeViewComponents();
@@ -124,6 +136,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
         trackRideCancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                sendCancelNotification();
                 Intent intent = new Intent();
                 intent.putExtra("status", "Cancelled");
                 setResult(RESULT_OK, intent);
@@ -134,6 +147,44 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
         loadAnimatedMap();
 
         openWebSocket();
+    }
+
+    private void createChannel() {
+        String id = getPackageName();
+        String name = ActivityCompat.getString(this, R.string.channel_name);
+        String desc = ActivityCompat.getString(this, R.string.channel_desc);
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+        NotificationChannel channel = new NotificationChannel(id, name, importance);
+        channel.setDescription(desc);
+        channel.enableVibration(true);
+        manager.createNotificationChannel(channel);
+    }
+
+    private void sendNotification() {
+        String channelId = getPackageName();
+        Notification notification = new Notification.Builder(this, channelId)
+                .setContentTitle("Driver has arrived")
+                .setContentText("Driver has arrived and is waiting for you at pickup")
+                .setSmallIcon(R.drawable.ic_getme_logo)
+                .setChannelId(channelId)
+                .build();
+
+        manager.notify(notificationId, notification);
+    }
+
+    private void sendCancelNotification() {
+        String channelId = getPackageName();
+
+        Notification notification =
+                new Notification.Builder(this, channelId)
+                        .setContentTitle("Ride Cancelled")
+                        .setContentText("Your Ride has been cancelled.")
+                        .setSmallIcon(R.drawable.ic_getme_logo)
+                        .setChannelId(channelId)
+                        .build();
+
+        manager.notify(notificationId, notification);
     }
 
     private void loadAnimatedMap() {
