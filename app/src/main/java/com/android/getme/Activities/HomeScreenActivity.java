@@ -3,6 +3,8 @@ package com.android.getme.Activities;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -25,6 +27,7 @@ import androidx.lifecycle.ViewModelProvider;
 import com.android.getme.Fragments.ActivityFragment;
 import com.android.getme.Fragments.HomeScreenFragment;
 import com.android.getme.Fragments.NotificationFragment;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.CustHomeFragListener;
 import com.android.getme.Listeners.OngoingRideListener;
 import com.android.getme.R;
@@ -206,11 +209,15 @@ public class HomeScreenActivity extends AppCompatActivity implements
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         int permission_granted = PackageManager.PERMISSION_GRANTED;
         if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] != permission_granted) {
-            Toast.makeText(this, "Location permission is needed for the app to work", Toast.LENGTH_SHORT).show();
+            WarningDialogFragment.newInstance("Location Not Enabled", "Location permission is needed for the app to work").show(
+                    getSupportFragmentManager(), "Location Warning Dialog"
+            );
         }
 
         if (permissions.length == 2 && permissions[1].equals(Manifest.permission.POST_NOTIFICATIONS) && grantResults[1] != permission_granted) {
-            Toast.makeText(this, "You will not get notitications", Toast.LENGTH_SHORT).show();
+            WarningDialogFragment.newInstance("Notifications Not Enabled", "You will not get notitications").show(
+                    getSupportFragmentManager(), "Notification Warning Dialog"
+            );
         }
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
@@ -258,16 +265,31 @@ public class HomeScreenActivity extends AppCompatActivity implements
 
     @Override
     public void onBookRideClicked(String vehicleType) {
-        custRideViewModel.vehicleType = vehicleType;
-        Intent intent = new Intent(this, ChoosePickupActivity.class);
-        intent.putExtra("vehicleType", vehicleType);
-        intent.putExtra("custId", custRideViewModel.custId);
-        startForResult.launch(intent);
+        if(isConnected()) {
+            custRideViewModel.vehicleType = vehicleType;
+            Intent intent = new Intent(this, ChoosePickupActivity.class);
+            intent.putExtra("vehicleType", vehicleType);
+            intent.putExtra("custId", custRideViewModel.custId);
+            startForResult.launch(intent);
+        } else {
+            WarningDialogFragment.newInstance("No Internet", "This app requires internet. " +
+                    "Please check your connection").show(getSupportFragmentManager(), "Internet Warning Dialog");
+        }
+
     }
 
     @Override
     public void ongoingRideClicked(String status) {
         custRideViewModel.status = status;
         startTrackRide();
+    }
+
+    private boolean isConnected() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 }

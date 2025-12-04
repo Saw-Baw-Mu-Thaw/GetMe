@@ -13,12 +13,14 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
+import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
 
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.R;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
@@ -90,6 +92,9 @@ public class RideCompleteActivity extends AppCompatActivity {
                     body.put("value", rideCmpRatingBar.getRating());
                 } catch (Exception e) {
                     e.printStackTrace();
+                    WarningDialogFragment.newInstance("JSON Encode Error",
+                            "Could not encode body for rating submission")
+                            .show(getSupportFragmentManager(), "Encode Warning Dialog");
                 }
 
                 JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, ratingUrl, body,
@@ -103,6 +108,9 @@ public class RideCompleteActivity extends AppCompatActivity {
                             @Override
                             public void onErrorResponse(VolleyError volleyError) {
                                 volleyError.printStackTrace();
+                                WarningDialogFragment.newInstance("Network Error",
+                                        "Could not submit rating")
+                                        .show(getSupportFragmentManager(), "Network Warning Dialog");
                             }
                         });
 
@@ -113,6 +121,14 @@ public class RideCompleteActivity extends AppCompatActivity {
         bookAnotherRideBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                setResult(RESULT_OK);
+                finish();
+            }
+        });
+
+        getOnBackPressedDispatcher().addCallback(new OnBackPressedCallback(true) {
+            @Override
+            public void handleOnBackPressed() {
                 setResult(RESULT_OK);
                 finish();
             }
@@ -165,10 +181,5 @@ public class RideCompleteActivity extends AppCompatActivity {
         bookAnotherRideBtn = findViewById(R.id.bookAnotherRideBtn);
     }
 
-    @Override
-    protected void onDestroy() {
-        setResult(RESULT_OK);
-        finish();
-        super.onDestroy();
-    }
+
 }

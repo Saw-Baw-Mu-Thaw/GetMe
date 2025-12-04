@@ -44,6 +44,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.getme.Adapters.PickupSearchAdapter;
 import com.android.getme.Adapters.TabPageAdapter;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.PickupSearchListener;
 import com.android.getme.Models.GHGeocodeResult;
 import com.android.getme.R;
@@ -166,7 +167,8 @@ public class ChoosePickupActivity extends AppCompatActivity
 
         // checking and requesting permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            Toast.makeText(this, "Location permission required for ride finding to work.", Toast.LENGTH_SHORT).show();
+            WarningDialogFragment.newInstance("Permission Error", "Location permission required for ride finding to work.")
+                            .show(getSupportFragmentManager(), "Permisssion Warning Dialog");
             finish();
         }
 
@@ -192,7 +194,8 @@ public class ChoosePickupActivity extends AppCompatActivity
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                e.printStackTrace();
+                WarningDialogFragment.newInstance("Network Error", "Could not get location")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
             }
         });
 
@@ -297,7 +300,8 @@ public class ChoosePickupActivity extends AppCompatActivity
                         theAddress = sb.toString();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    WarningDialogFragment.newInstance("Location Error", "Could not get current location")
+                            .show(getSupportFragmentManager(), "Location Warning Dialog");
                 }
                 Message msg = handler.obtainMessage();
                 Bundle bundle = new Bundle();
@@ -327,15 +331,6 @@ public class ChoosePickupActivity extends AppCompatActivity
         adapter = new PickupSearchAdapter(this);
         pickupSearchRecyclerView.setLayoutManager(new LinearLayoutManager(this));
         pickupSearchRecyclerView.setAdapter(adapter);
-    }
-
-    private boolean isConnected() {
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
-        return false;
     }
 
     @Override

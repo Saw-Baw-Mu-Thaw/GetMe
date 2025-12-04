@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.service.voice.VoiceInteractionSession;
+import android.util.Log;
 import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
@@ -31,6 +32,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.android.getme.Fragments.AnimatedMapFragment;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.TrackRideListener;
 import com.android.getme.Models.DriverProfileResult;
 import com.android.getme.R;
@@ -39,10 +41,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
 import okhttp3.OkHttpClient;
@@ -136,17 +140,53 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
         trackRideCancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                sendCancelNotification();
                 Intent intent = new Intent();
                 intent.putExtra("status", "Cancelled");
                 setResult(RESULT_OK, intent);
-                finish();
+                cancelRide();
             }
         });
 
         loadAnimatedMap();
 
         openWebSocket();
+    }
+
+    private void cancelRide() {
+
+        sendCancelNotification();
+
+        String url = BASEURL + "/ride/cancel";
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("rideId", mViewModel.rideId);
+        }catch(Exception e) {
+            WarningDialogFragment.newInstance("JSON Encode Warning",
+                            "Could not encode rideId")
+                    .show(getSupportFragmentManager(), "Cancel Warning dialog");
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        finish();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.e("Find Driver", "Cancel Ride Error." + volleyError.toString());
+                WarningDialogFragment.newInstance("Network Error",
+                        "Ride could not be cancelled")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
+            }
+        });
+
+        queue.add(request);
+
     }
 
     private void createChannel() {
@@ -273,6 +313,9 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 volleyError.printStackTrace();
+                WarningDialogFragment.newInstance("Network Error",
+                        "Could not fetch driver")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
             }
         });
 

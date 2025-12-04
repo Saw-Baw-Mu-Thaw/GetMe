@@ -61,10 +61,10 @@ public class ActivityFragment extends Fragment {
 
     private void configureTabLayout(View view) {
         TabLayout tabLayout = view.findViewById(R.id.tabLayout);
-        tabLayout.addTab(tabLayout.newTab()); // tab for ongoing
-        tabLayout.addTab(tabLayout.newTab()); // tab for history
+        tabLayout.addTab(tabLayout.newTab());
+        tabLayout.addTab(tabLayout.newTab());
 
-        final TabPageAdapter adapter = new TabPageAdapter(getActivity(), custId, vehicleType);
+        final TabPageAdapter adapter = new TabPageAdapter(requireActivity(), custId, vehicleType);
         ViewPager2 viewPager2 = view.findViewById(R.id.view_pager);
         viewPager2.setAdapter(adapter);
 

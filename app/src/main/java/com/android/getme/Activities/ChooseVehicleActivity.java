@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.R;
 import com.android.getme.ViewModels.ChooseVehicleViewModel;
 
@@ -172,7 +173,6 @@ public class ChooseVehicleActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(viewModel.chosenVehicleType != 0) {
                     // start FindDriver Activity
-//                    Toast.makeText(ChooseVehicleActivity.this, "Will book a ride soon", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(ChooseVehicleActivity.this, FindDriverActivity.class);
                     intent.putExtra("vehicleType", viewModel.vehicleType);
                     intent.putExtra("pickupLat", viewModel.pickupLocation.getLatitude());
@@ -191,7 +191,8 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                     startForResult.launch(intent);
 
                 }else {
-                    Toast.makeText(ChooseVehicleActivity.this, "Please Choose a Vehicle Type", Toast.LENGTH_SHORT).show();
+                    WarningDialogFragment.newInstance("Warning", "Please Choose a Vehicle Type")
+                            .show(getSupportFragmentManager(), "Vehicle Warning Dialog");
                 }
             }
         });

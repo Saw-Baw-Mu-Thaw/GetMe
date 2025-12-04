@@ -160,8 +160,8 @@ public class OngoingTabFragment extends Fragment {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                volleyError.printStackTrace();
-                Toast.makeText(getContext(), "Couldn't fetch ongoing ride", Toast.LENGTH_SHORT).show();
+                WarningDialogFragment.newInstance("Network Error", "Could not fetch ongoing ride")
+                        .show(getChildFragmentManager(), "Network Warning Dialog");
             }
         });
 
@@ -186,7 +186,8 @@ public class OngoingTabFragment extends Fragment {
                     driverTimeLinlay.setVisibility(View.VISIBLE);
                     noOngoingLinlay.setVisibility(View.GONE);
                 }catch (Exception e) {
-                    e.printStackTrace();
+                    WarningDialogFragment.newInstance("Network Error", "Could not fetch Driver")
+                            .show(getChildFragmentManager(), "Network Warning Dialog");
                 }
 
 
@@ -194,7 +195,8 @@ public class OngoingTabFragment extends Fragment {
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                volleyError.printStackTrace();
+                WarningDialogFragment.newInstance("Network Error", "Could not connect to server")
+                        .show(getChildFragmentManager(), "Network Warning Dialog");
             }
         });
 

@@ -78,7 +78,8 @@ public class NotificationFragment extends Fragment {
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError volleyError) {
-                volleyError.printStackTrace();
+                WarningDialogFragment.newInstance("Network Error", "Could not fetch notifications")
+                        .show(getChildFragmentManager(), "Network Warning Dialog");
             }
         });
 

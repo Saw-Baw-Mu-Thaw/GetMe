@@ -21,6 +21,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Models.CreateRideResult;
 import com.android.getme.R;
 import com.android.getme.ViewModels.FindDriverViewModel;
@@ -114,7 +115,9 @@ public class FindDriverActivity extends AppCompatActivity{
         try {
             jsonObject.put("rideId", viewModel.rideId);
         }catch(Exception e) {
-            e.printStackTrace();
+            WarningDialogFragment.newInstance("JSON Encode Warning",
+                    "Could not encode rideId")
+                    .show(getSupportFragmentManager(), "Cancel Warning dialog");
         }
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
@@ -175,7 +178,9 @@ public class FindDriverActivity extends AppCompatActivity{
             jsonObject.put("duration", viewModel.duration/60);
             jsonObject.put("status", "Finding Driver");
         }catch (Exception e) {
-            e.printStackTrace();
+            WarningDialogFragment.newInstance("JSON Encode Error",
+                    "Could not encode ride create body")
+                    .show(getSupportFragmentManager(), "Encode Warning Dialog");
         }
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
@@ -187,7 +192,9 @@ public class FindDriverActivity extends AppCompatActivity{
 
                             openWebSocket();
                         }catch(Exception e) {
-                            e.printStackTrace();
+                            WarningDialogFragment.newInstance("JSON Decode Error",
+                                    "Could not decode rideId from json body")
+                                    .show(getSupportFragmentManager(), "Decode Warning Dialog");
                         }
 
                     }
@@ -196,6 +203,8 @@ public class FindDriverActivity extends AppCompatActivity{
             public void onErrorResponse(VolleyError volleyError) {
                 Log.e("Find Driver", "Ride request encountered an error.");
                 volleyError.printStackTrace();
+                WarningDialogFragment.newInstance("Network Error", "Could not connect to server")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
             }
         });
 
