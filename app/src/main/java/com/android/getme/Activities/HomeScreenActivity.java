@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.android.getme.Fragments.ActivityFragment;
 import com.android.getme.Fragments.HomeScreenFragment;
+import com.android.getme.Fragments.NotificationFragment;
 import com.android.getme.Listeners.CustHomeFragListener;
 import com.android.getme.Listeners.OngoingRideListener;
 import com.android.getme.R;
@@ -195,7 +196,10 @@ public class HomeScreenActivity extends AppCompatActivity implements
         notificationScreenLinLay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showToast("Notification screen will be shown here");
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.homeScreenFragContainer,
+                                new NotificationFragment()).commit();
             }
         });
 
