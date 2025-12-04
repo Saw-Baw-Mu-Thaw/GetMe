@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.getme.Adapters.PickupSearchAdapter;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.PickupSearchListener;
 import com.android.getme.Models.GHGeocodeResult;
 import com.android.getme.R;
@@ -183,7 +184,8 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
             public void onClick(View view) {
                 if(viewModel.dropoffLocation == null) {
                     // TODO : replace with alert dialog
-                    Toast.makeText(ChooseDropoffActivity.this, "Destination not selected", Toast.LENGTH_SHORT).show();
+                    WarningDialogFragment.newInstance("Destination Error", "Destionation not selected")
+                            .show(getSupportFragmentManager(), "Destination Warning Dialog");
                     return;
                 }
                 Intent intent = new Intent(ChooseDropoffActivity.this, ChooseVehicleActivity.class);
