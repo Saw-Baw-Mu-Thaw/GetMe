@@ -1,9 +1,11 @@
 package com.android.getme.Fragments;
 
+import android.content.Context;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 
 import android.view.LayoutInflater;
@@ -49,7 +51,7 @@ public class OngoingTabFragment extends Fragment {
 
     private RequestQueue queue;
 
-    final private String BASEURL = "http://10.0.2.2:8000";
+    private String BASEURL;
     private int custId;
     private String vehicleType;
     private String status;
@@ -68,6 +70,12 @@ public class OngoingTabFragment extends Fragment {
         OngoingTabFragment fragment = new OngoingTabFragment();
         fragment.setArguments(b);
         return fragment;
+    }
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        BASEURL = ActivityCompat.getString(context, R.string.base_url);
+        super.onAttach(context);
     }
 
     @Override

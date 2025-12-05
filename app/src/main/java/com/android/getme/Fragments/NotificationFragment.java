@@ -2,11 +2,13 @@ package com.android.getme.Fragments;
 
 import static android.content.Context.MODE_PRIVATE;
 
+import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -29,7 +31,13 @@ import com.google.gson.Gson;
 public class NotificationFragment extends Fragment {
 
     private int custId;
-    final private String BASEURL = "http://10.0.2.2:8000";
+    private String BASEURL;
+
+    @Override
+    public void onAttach(@NonNull Context context) {
+        BASEURL = ActivityCompat.getString(context, R.string.base_url);
+        super.onAttach(context);
+    }
 
     public NotificationFragment() {
         // Required empty public constructor

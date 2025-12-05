@@ -212,6 +212,9 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
 
         pickupMarker = new Marker(map);
         pickupMarker.setPosition(viewModel.pickupLocation);
+        pickupMarker.setTitle(viewModel.pickupName);
+        pickupMarker.setSubDescription(viewModel.pickupAddress);
+        pickupMarker.setIcon(ActivityCompat.getDrawable(this, R.drawable.pickup_icon));
         map.getOverlays().add(pickupMarker);
         map.invalidate();
 
@@ -249,6 +252,7 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
         dropoffMarker.setPosition(viewModel.dropoffLocation);
         dropoffMarker.setTitle(name);
         dropoffMarker.setSubDescription(address);
+        dropoffMarker.setIcon(ActivityCompat.getDrawable(this, R.drawable.dropoff_icon));
         mapController.setCenter(new GeoPoint(lat,lng));
         mapController.setZoom(15.0);
         map.getOverlays().add(dropoffMarker);

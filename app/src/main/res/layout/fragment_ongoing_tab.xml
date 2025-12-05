@@ -121,7 +121,9 @@
                                     android:layout_height="wrap_content"
                                     android:layout_width="wrap_content"
                                     android:numStars="5"
-                                    style="@style/driverRatingBar"/>
+                                    style="@style/driverRatingBar"
+                                    android:stepSize="1.0"
+                                    android:clickable="false"/>
                                 <TextView
                                     android:id="@+id/ongoingRatingTextView"
                                     android:layout_width="wrap_content"

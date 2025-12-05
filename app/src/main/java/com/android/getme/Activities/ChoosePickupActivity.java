@@ -58,7 +58,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
@@ -189,6 +193,26 @@ public class ChoosePickupActivity extends AppCompatActivity
                     map.getOverlays().add(currLocationMarker);
                     map.invalidate();
                     setCurrentLocationAddress();
+                } else {
+                    LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+                            .setMinUpdateIntervalMillis(5000)
+                                    .build();
+                    LocationCallback locationCallback = new LocationCallback() {
+                        @Override
+                        public void onLocationResult(@NonNull LocationResult locationResult) {
+                            if(locationResult == null) {
+                                return;
+                            }
+                            onSuccess(locationResult.getLocations().get(-1));
+                        }
+                    };
+                    try{
+                        fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,
+                                Looper.getMainLooper());
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    }
+
                 }
             }
         }).addOnFailureListener(new OnFailureListener() {
@@ -223,6 +247,7 @@ public class ChoosePickupActivity extends AppCompatActivity
                 pickupMarker.setPosition(viewModel.currLocation);
                 pickupMarker.setTitle(viewModel.pickupName);
                 pickupMarker.setSubDescription(viewModel.pickupAddress);
+                pickupMarker.setIcon(ActivityCompat.getDrawable(ChoosePickupActivity.this, R.drawable.pickup_icon));
                 map.getOverlays().add(pickupMarker);
                 map.invalidate();
 
@@ -342,6 +367,7 @@ public class ChoosePickupActivity extends AppCompatActivity
             pickupMarker = new Marker(map);
         }
         pickupMarker.setPosition(new GeoPoint(lat, lng));
+        pickupMarker.setIcon(ActivityCompat.getDrawable(this, R.drawable.pickup_icon));
         pickupMarker.setTitle(name);
         pickupMarker.setSubDescription(address);
         map.getOverlays().add(pickupMarker);

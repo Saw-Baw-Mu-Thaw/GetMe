@@ -15,6 +15,7 @@ import android.view.View;
 import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -58,7 +59,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
     private TextView trackRideArrivalTextView;
 
     private TextView trackRideDriverNameTextView;
-    private TextView trackDriverRatingTextView;
+    private RatingBar trackDriverRatingBar;
     private TextView trackRideMakeTextView;
     private TextView trackDriverColorTextView;
     private TextView trackRideLicenseTextView;
@@ -81,14 +82,15 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
     private String baseFare;
     private double distance;
     private String total;
+    private int averageRating;
 
     private final double driverLat = 10.740897;
     private final double driverLng = 106.695322;
 
     private OkHttpClient client;
     private WebSocket webSocket;
-    final private String BASEURL = "http://10.0.2.2:8000";
-    final private String WSURL = "ws://10.0.2.2:8000/ws";
+    private String BASEURL;
+    private String WSURL;
     private NotificationManager manager;
     final private int notificationId = 101;
 
@@ -124,6 +126,10 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
         mViewModel = new ViewModelProvider(this).get(CustRideViewModel.class);
 
         manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        BASEURL = ActivityCompat.getString(this, R.string.base_url);
+        WSURL = ActivityCompat.getString(this, R.string.ws_url);
+
 
         createChannel();
 
@@ -247,15 +253,20 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
     }
 
     private void setPrices() {
+
+        String economyRate = ActivityCompat.getString(this, R.string.economy_rate) + " VND";
+        String standardRate = ActivityCompat.getString(this, R.string.standard_rate) + " VND";
+        String bikeRate = ActivityCompat.getString(this, R.string.bike_rate) + " VND";
+
         switch (mViewModel.vehicleType) {
             case "Standard":
-                trackRideBaseFareTextView.setText("100,000 VND");
+                trackRideBaseFareTextView.setText(standardRate);
                 break;
             case "Economy":
-                trackRideBaseFareTextView.setText("80,000 VND");
+                trackRideBaseFareTextView.setText(economyRate);
                 break;
             case "Bike":
-                trackRideBaseFareTextView.setText("50,000 VND");
+                trackRideBaseFareTextView.setText(bikeRate);
                 break;
         }
 
@@ -291,7 +302,8 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
                 driverMake = result.make;
 
                 trackRideDriverNameTextView.setText(result.fullname);
-                trackDriverRatingTextView.setText("Rating: 4.0 (3 rides)");
+                trackDriverRatingBar.setRating(result.average_rating);
+                averageRating = result.average_rating;
                 trackRideMakeTextView.setText(result.make);
                 trackDriverColorTextView.setText(result.color);
                 trackRideLicenseTextView.setText(result.license);
@@ -326,7 +338,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
         trackRideRideStatusTextView = findViewById(R.id.trackRideRideStatusTextView);
         trackRideArrivalTextView = findViewById(R.id.trackRideArrivalTextView);
         trackRideDriverNameTextView = findViewById(R.id.trackRideDriverNameTextView);
-        trackDriverRatingTextView = findViewById(R.id.trackDriverRatingTextView);
+        trackDriverRatingBar = findViewById(R.id.trackDriverRatingBar);
         trackRideMakeTextView = findViewById(R.id.trackRideMakeTextView);
         trackDriverColorTextView = findViewById(R.id.trackDriverColorTextView);
         trackRideLicenseTextView = findViewById(R.id.trackRideLicenseTextView);
@@ -429,6 +441,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
                 intent.putExtra("distance", mViewModel.distance);
                 intent.putExtra("total", trackRideTotalCostTextView.getText().toString());
                 intent.putExtra("payment", mViewModel.payment);
+                intent.putExtra("rating", averageRating);
                         // also include rating
                 startForResult.launch(intent);
             }
