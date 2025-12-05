@@ -12,6 +12,7 @@ import androidx.cardview.widget.CardView;
 import androidx.fragment.app.Fragment;
 
 import com.android.getme.Activities.DriverEarningActivity;
+import com.android.getme.Activities.TripHistoryActivity;
 import com.android.getme.R;
 
 public class OfflineFragment extends Fragment {
@@ -31,6 +32,16 @@ public class OfflineFragment extends Fragment {
             earningDisplay.setOnClickListener(v -> {
                 // Use getActivity() for the context
                 Intent intent = new Intent(getActivity(), DriverEarningActivity.class);
+                startActivity(intent);
+            });
+        }
+
+        CardView tripHistoryDisplay = view.findViewById(R.id.driverTripHistory);
+
+        if (tripHistoryDisplay != null) {
+            tripHistoryDisplay.setOnClickListener(v -> {
+                // Use getActivity() for the context
+                Intent intent = new Intent(getActivity(), TripHistoryActivity.class);
                 startActivity(intent);
             });
         }

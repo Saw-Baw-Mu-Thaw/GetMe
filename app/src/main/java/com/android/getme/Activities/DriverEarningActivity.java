@@ -34,6 +34,8 @@ public class DriverEarningActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_earning);
 
+
+
         // Hide default action bar if present
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
