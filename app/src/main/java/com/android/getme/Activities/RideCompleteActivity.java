@@ -31,12 +31,13 @@ import com.android.volley.toolbox.Volley;
 
 import org.json.JSONObject;
 
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class RideCompleteActivity extends AppCompatActivity {
 
     private TextView rideCmpDriverNameTxt;
-    private TextView rideCmpDriverRatingTxt;
+    private RatingBar rideCmpDriverRatingBar;
     private TextView rideCmpDriverMakeTxt;
     private TextView rideCmpDriverLicenseTxt;
     private TextView rideCmpBaseFareTxt;
@@ -49,7 +50,7 @@ public class RideCompleteActivity extends AppCompatActivity {
     private Button bookAnotherRideBtn;
     private int rideId;
 
-    final private String ratingUrl = "http://10.0.2.2:8000/rating";
+    private String ratingUrl;
 
     private NotificationManager manager;
     final private int notificationId = 101;
@@ -58,6 +59,8 @@ public class RideCompleteActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_ride_complete);
+
+        ratingUrl = ActivityCompat.getString(this, R.string.base_url) + "/rating";
 
         initializeComponents();
 
@@ -68,9 +71,10 @@ public class RideCompleteActivity extends AppCompatActivity {
             rideCmpDriverLicenseTxt.setText(b.getString("license"));
             rideCmpDriverMakeTxt.setText(b.getString("make"));
             rideCmpBaseFareTxt.setText(b.getString("fare"));
-            String distance = b.getDouble("distance") + " km";
+            String distance = String.format( Locale.ENGLISH,"%.1f km", b.getDouble("distance"));
             rideCmpDistanceTxt.setText(distance);
             rideCmpTotalCostTxt.setText(b.getString("total"));
+            rideCmpDriverRatingBar.setRating(b.getInt("rating"));
             String payment = b.getString("payment");
             if (payment.equals("Cash")) {
                 rideCmpPaymentImg.setImageDrawable(ActivityCompat.getDrawable(this, R.drawable.cash));
@@ -168,7 +172,7 @@ public class RideCompleteActivity extends AppCompatActivity {
 
     private void initializeComponents() {
         rideCmpDriverNameTxt = findViewById(R.id.rideCompleteDriverName);
-        rideCmpDriverRatingTxt = findViewById(R.id.rideCompleteDriverRating);
+        rideCmpDriverRatingBar = findViewById(R.id.rideCompleteDriverRatingBar);
         rideCmpDriverMakeTxt = findViewById(R.id.rideCompleteDriverMake);
         rideCmpDriverLicenseTxt = findViewById(R.id.rideCompleteDriverLicense);
         rideCmpBaseFareTxt = findViewById(R.id.rideCompleteBaseFareTextView);

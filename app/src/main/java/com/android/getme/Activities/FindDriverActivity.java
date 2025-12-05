@@ -56,8 +56,8 @@ public class FindDriverActivity extends AppCompatActivity{
     private RequestQueue queue;
     private OkHttpClient client;
     private WebSocket webSocket;
-    private final String BASEURL = "http://10.0.2.2:8000";
-    private final String WSURL = "ws://10.0.2.2:8000/ws";
+    private String BASEURL;
+    private String WSURL;
 
     private NotificationManager manager;
     final private int notificationId = 101;
@@ -68,6 +68,8 @@ public class FindDriverActivity extends AppCompatActivity{
         setContentView(R.layout.activity_find_driver);
 
         manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        BASEURL = ActivityCompat.getString(this, R.string.base_url);
+        WSURL = ActivityCompat.getString(this, R.string.ws_url);
 
         createNotificationChannel();
 

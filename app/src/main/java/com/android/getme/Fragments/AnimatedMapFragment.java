@@ -16,6 +16,7 @@ import android.os.Bundle;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.Fragment;
 
 import android.renderscript.Sampler;
@@ -23,9 +24,11 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.android.getme.Activities.ChooseVehicleActivity;
 import com.android.getme.Listeners.TrackRideListener;
 import com.android.getme.R;
 
+import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -34,6 +37,7 @@ import org.osmdroid.config.Configuration;
 import org.osmdroid.util.BoundingBox;
 import org.osmdroid.util.GeoPoint;
 import org.osmdroid.views.MapView;
+import org.osmdroid.views.overlay.Marker;
 import org.osmdroid.views.overlay.Polyline;
 import org.osmdroid.views.overlay.milestones.MilestoneBitmapDisplayer;
 import org.osmdroid.views.overlay.milestones.MilestoneDisplayer;
@@ -153,7 +157,7 @@ public class AnimatedMapFragment extends Fragment {
 
         final List<MilestoneManager> managers = new ArrayList<>();
         final MilestoneMeterDistanceSliceLister slicerForPath =new MilestoneMeterDistanceSliceLister();
-        final Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.next);
+        final Bitmap bitmap = BitmapFactory.decodeResource(getResources(), R.drawable.car);
         final MilestoneMeterDistanceSliceLister slicerForIcon =new MilestoneMeterDistanceSliceLister();
 
         managers.add(getAnimatedPathManager(slicerForPath));
@@ -182,6 +186,11 @@ public class AnimatedMapFragment extends Fragment {
             @Override
             public void onAnimationEnd(Animator animation) {
                 mAnimationEnded = true;
+                Marker car = new Marker(map);
+                car.setPosition(mGeoPoints.get(mGeoPoints.size()-1));
+                car.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.car));
+                car.setInfoWindow(null);
+                map.getOverlays().add(car);
                 map.invalidate();
             }
         });
@@ -190,12 +199,24 @@ public class AnimatedMapFragment extends Fragment {
     }
 
     private  void setGeoPoints() {
-        RoadManager roadManager = (RoadManager) new OSRMRoadManager(getContext(),userAgent);
+        String provider = ActivityCompat.getString(requireContext(), R.string.provider);
+
+        RoadManager roadManager;
+        if(provider.equals("OSRM")) {
+            roadManager = new OSRMRoadManager(requireContext(), userAgent);
+            ((OSRMRoadManager) roadManager).setMean(OSRMRoadManager.MEAN_BY_CAR);
+        } else {
+            String api_key = ActivityCompat.getString(requireContext(), R.string.GH_key);
+            roadManager = new GraphHopperRoadManager(api_key, false);
+            roadManager.addRequestOption("profile=car");
+            roadManager.addRequestOption("snap_prevention=motorway");
+            roadManager.addRequestOption("snap_prevention=ferry");
+            roadManager.addRequestOption("snap_prevention=tunnel");
+            roadManager.addRequestOption("locale=en");
+        }
         ArrayList<GeoPoint> waypoints = new ArrayList<>();
         waypoints.add(new GeoPoint(startLat, startLng));
         waypoints.add(new GeoPoint(endLat, endLng));
-
-        ((OSRMRoadManager) roadManager).setMean(OSRMRoadManager.MEAN_BY_CAR);
 
         MyAsyncTask asyncTask = new MyAsyncTask();
         asyncTask.execute(roadManager, waypoints);
@@ -232,14 +253,14 @@ public class AnimatedMapFragment extends Fragment {
             listener.setDuration((Integer) objects[2]);
             final BoundingBox boundingBox = BoundingBox.fromGeoPoints(mGeoPoints);
             map.zoomToBoundingBox(boundingBox, false, 30);
-            map.setMultiTouchControls(false);
+            map.setMultiTouchControls(true);
             addOverlays();
         }
     }
 
     private MilestoneManager getEndManager(Bitmap bitmap) {
         return new MilestoneManager(
-                new MilestoneMeterDistanceLister((int) Math.round(distance * 1000)), // Listen only at the total distance
+                new MilestoneMeterDistanceLister((int)Math.round(distance * 1000)), // Listen only at the total distance
                 new MilestoneBitmapDisplayer(0, true,
                         bitmap, bitmap.getWidth()/2, bitmap.getHeight()/2) {
                     @Override
@@ -275,6 +296,8 @@ public class AnimatedMapFragment extends Fragment {
                     @Override
                     protected void draw(Canvas pCanvas, Object pParameter) {
                         if(!mAnimationEnded) {
+                            super.draw(pCanvas, pParameter);
+                        } else {
                             super.draw(pCanvas, pParameter);
                         }
 
