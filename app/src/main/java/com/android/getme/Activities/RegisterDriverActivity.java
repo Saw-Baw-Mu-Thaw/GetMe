@@ -168,33 +168,33 @@ public class RegisterDriverActivity extends AppCompatActivity {
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, json,
                 response -> {
-                    try {
-                        int driverId = response.getInt("driverId");
-                        Toast.makeText(this, "Driver account created!", Toast.LENGTH_LONG).show();
+                    // SUCCESS → Same as RegisterUserActivity
+                    Toast.makeText(this, "Registration successful! Please log in.", Toast.LENGTH_LONG).show();
 
-                        // Save session and profile data
-                        saveDriverSessionAndProfile(driverId, fullname, email, phone, make, license, color);
+                    // Optional: Save profile data for later (when they actually log in)
+                    getSharedPreferences("DriverPrefs", MODE_PRIVATE)
+                            .edit()
+                            .putString("fullName", fullname)
+                            .putString("email", email)
+                            .putString("phone", phone)
+                            .putString("vehicleModel", make)
+                            .putString("licensePlate", license)
+                            .putString("vehicleColor", color)
+                            .putString("vehicleType", selectedVehicleType)
+                            .apply();
 
-                        // Go to driver dashboard
-                        Intent intent = new Intent(this, MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
+                    // GO TO LOGIN SCREEN (not dashboard)
+                    Intent intent = new Intent(RegisterDriverActivity.this, MainActivity.class);
+                    intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
 
-                    } catch (Exception e) {
-                        Toast.makeText(this, "Success! Welcome Driver", Toast.LENGTH_SHORT).show();
-                        saveDriverSessionAndProfile(0, fullname, email, phone, make, license, color);
-                        Intent intent = new Intent(this, DriverDashboard.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
-                        finish();
-                    }
                 },
                 error -> {
-                    String msg = "Registration failed";
+                    String msg = "Registration failed. Try again.";
                     if (error.networkResponse != null && error.networkResponse.data != null) {
                         try {
-                            String body = new String(error.networkResponse.data);
+                            String body = new String(error.networkResponse.data, "utf-8");
                             JSONObject obj = new JSONObject(body);
                             msg = obj.optString("detail", "Email or license already exists");
                         } catch (Exception ignored) {}
@@ -212,7 +212,7 @@ public class RegisterDriverActivity extends AppCompatActivity {
         getSharedPreferences("SESSION", MODE_PRIVATE)
                 .edit()
                 .putBoolean("loggedIn", true)
-                .putBoolean("isUser", false)  // false = driver
+                .putBoolean("isUser", false)
                 .putInt("userId", driverId)
                 .putString("userName", fullname)
                 .putString("userEmail", email)
@@ -225,11 +225,11 @@ public class RegisterDriverActivity extends AppCompatActivity {
                 .putString("fullName", fullname)
                 .putString("email", email)
                 .putString("phone", phone)
-                .putString("gender", "Male") // Default
+                .putString("gender", " ")
                 .putString("vehicleModel", vehicleModel)
                 .putString("licensePlate", licensePlate)
                 .putString("vehicleColor", vehicleColor)
-                .putString("vehicleType", selectedVehicleType) // "Car" or "Bike"
+                .putString("vehicleType", selectedVehicleType)
                 .putInt("totalRides", 0)
                 .putInt("acceptanceRate", 100)
                 .putBoolean("isPremium", false)

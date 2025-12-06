@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -32,9 +33,8 @@ public class UserProfileFragment extends Fragment {
     private static final String KEY_IS_PREMIUM = "isPremium";
 
     // Views
-    private TextView tvProfileUserName, tvProfileFullName, tvProfileEmail, tvProfilePhone, tvMembershipStatus;
+    private TextView tvProfileUserName, tvProfileFullName, tvProfileEmail, tvProfilePhone;
     private Spinner spinnerGender;
-    private ImageView ivSettings;
     private ShapeableImageView ivProfilePicture;
     private MaterialButton btnProfileLogout;
 
@@ -63,7 +63,6 @@ public class UserProfileFragment extends Fragment {
         loadUserProfile(); // First load
     }
 
-    // This is the MOST IMPORTANT line — refreshes data every time you open Profile
     @Override
     public void onResume() {
         super.onResume();
@@ -75,9 +74,7 @@ public class UserProfileFragment extends Fragment {
         tvProfileFullName = view.findViewById(R.id.tvProfileFullName);
         tvProfileEmail = view.findViewById(R.id.tvProfileEmail);
         tvProfilePhone = view.findViewById(R.id.tvProfilePhone);
-        tvMembershipStatus = view.findViewById(R.id.tvMembershipStatus);
         spinnerGender = view.findViewById(R.id.spinnerGender);
-        ivSettings = view.findViewById(R.id.ivSettings);
         ivProfilePicture = view.findViewById(R.id.ivProfilePicture);
         btnProfileLogout = view.findViewById(R.id.btnProfileLogout);
     }
@@ -91,28 +88,27 @@ public class UserProfileFragment extends Fragment {
     }
 
     private void setupClickListeners() {
-        ivSettings.setOnClickListener(v ->
-                Toast.makeText(requireContext(), "Settings clicked", Toast.LENGTH_SHORT).show());
-
         ivProfilePicture.setOnClickListener(v ->
                 Toast.makeText(requireContext(), "Change profile picture", Toast.LENGTH_SHORT).show());
 
         btnProfileLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
     }
 
+
     private void loadUserProfile() {
-        String fullName = sharedPreferences.getString(KEY_FULL_NAME, "Guest User");
-        String email = sharedPreferences.getString(KEY_EMAIL, "Not set");
-        String phone = sharedPreferences.getString(KEY_PHONE, "Not set");
-        String gender = sharedPreferences.getString(KEY_GENDER, "Male");
-        boolean isPremium = sharedPreferences.getBoolean(KEY_IS_PREMIUM, false);
+        String fullName = sharedPreferences.getString("fullName", "User");
+        String email = sharedPreferences.getString("email", "No email");
+        String phone = sharedPreferences.getString("phone", "Not set");
+
+        Log.d("PROFILE_DEBUG", "Name: '" + fullName + "' | Email: '" + email + "' | Phone: '" + phone + "'");
 
         tvProfileUserName.setText(fullName);
         tvProfileFullName.setText(fullName);
         tvProfileEmail.setText(email);
         tvProfilePhone.setText(phone);
-        tvMembershipStatus.setText(isPremium ? "Premium Member" : "Free Member");
 
+        // Gender
+        String gender = sharedPreferences.getString("gender", " ");
         int position = 0;
         switch (gender.toLowerCase()) {
             case "female": position = 1; break;

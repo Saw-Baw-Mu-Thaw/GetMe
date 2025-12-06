@@ -146,7 +146,6 @@ public class RegisterUserActivity extends AppCompatActivity {
                     // SUCCESS → Show message and go back to Login
                     Toast.makeText(this, "Registration successful! Please log in.", Toast.LENGTH_LONG).show();
 
-                    // DO NOT save loggedIn = true → force user to login manually
                     // Just save profile data so when they DO login, profile shows correct info
                     getSharedPreferences("UserPrefs", MODE_PRIVATE)
                             .edit()

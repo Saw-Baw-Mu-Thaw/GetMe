@@ -1,6 +1,7 @@
 package com.android.getme.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.util.Log;
@@ -40,8 +41,7 @@ public class DriverEarningActivity extends AppCompatActivity {
     private TextView txtAmount;
     private TextView txtTotalTrips;
 
-    // TODO: Dynamic Driver ID
-    private static final int DRIVER_ID = 2;
+    private int driverId;
     // Base URL for Emulator (10.0.2.2)
     private static final String BASE_URL = "http://10.0.2.2:8000";
 
@@ -49,6 +49,9 @@ public class DriverEarningActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_earning);
+
+        SharedPreferences sp = getSharedPreferences("SESSION", MODE_PRIVATE);
+        driverId = sp.getInt("userId", -1);
 
         // Hide ActionBar
         if (getSupportActionBar() != null) {
@@ -84,7 +87,7 @@ public class DriverEarningActivity extends AppCompatActivity {
      * Endpoint: /earnings
      */
     private void fetchEarningsData() {
-        String url = BASE_URL + "/earnings?driverId=" + DRIVER_ID;
+        String url = BASE_URL + "/earnings?driverId=" + driverId;
 
         JsonObjectRequest jsonObjectRequest = new JsonObjectRequest(Request.Method.GET, url, null,
                 response -> {
@@ -113,7 +116,7 @@ public class DriverEarningActivity extends AppCompatActivity {
      * Logic adapted from TripHistoryActivity.java
      */
     private void fetchRecentTrips() {
-        String url = BASE_URL + "/trip/history?driverId=" + DRIVER_ID;
+        String url = BASE_URL + "/trip/history?driverId=" + driverId;
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(Request.Method.GET, url, null,
                 response -> {

@@ -4,7 +4,6 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.view.View;
 import android.util.Log;
 import android.widget.EditText;
 import android.widget.ImageView;
@@ -15,18 +14,10 @@ import android.widget.Toast;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.getme.R;
-import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
-import com.android.volley.toolbox.JsonObjectRequest;
-import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.button.MaterialButton;
-import com.google.gson.JsonObject;
-
-import org.json.JSONObject;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,8 +31,7 @@ public class MainActivity extends AppCompatActivity {
     private MaterialButton btnLogin;
 
     private boolean isUser = true;
-    private static final String BASE_URL = "http://10.0.2.2:8000"; // Your IP
-
+    private static final String BASE_URL = "http://10.0.2.2:8000";
     private SharedPreferences sp;
 
     @Override
@@ -50,26 +40,22 @@ public class MainActivity extends AppCompatActivity {
 
         sp = getSharedPreferences("SESSION", MODE_PRIVATE);
 
-        // Auto login if saved
+        // Auto login if already logged in
         if (sp.getBoolean("loggedIn", false)) {
             launchCorrectHomeScreen();
             return;
         }
 
         setContentView(R.layout.activity_login);
-
         initViews();
         setupToggle();
 
         btnLogin.setOnClickListener(v -> validateAndLogin());
 
         tvRegister.setOnClickListener(v -> {
-            Intent intent;
-            if (isUser) {
-                intent = new Intent(MainActivity.this, RegisterUserActivity.class);
-            } else {
-                intent = new Intent(MainActivity.this, RegisterDriverActivity.class);
-            }
+            Intent intent = isUser
+                    ? new Intent(this, RegisterUserActivity.class)
+                    : new Intent(this, RegisterDriverActivity.class);
             startActivity(intent);
         });
 
@@ -96,20 +82,13 @@ public class MainActivity extends AppCompatActivity {
         String email = edtLoginEmail.getText().toString().trim();
         String password = edtLoginPassword.getText().toString().trim();
 
-        if (email.isEmpty()) {
-            edtLoginEmail.setError("Enter email");
+        if (email.isEmpty() || !android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            edtLoginEmail.setError("Valid email required");
             edtLoginEmail.requestFocus();
             return;
         }
-
-        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
-            edtLoginEmail.setError("Invalid email");
-            edtLoginEmail.requestFocus();
-            return;
-        }
-
         if (password.isEmpty()) {
-            edtLoginPassword.setError("Enter password");
+            edtLoginPassword.setError("Password required");
             edtLoginPassword.requestFocus();
             return;
         }
@@ -118,7 +97,6 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void performLogin(String email, String password) {
-
         String url = isUser ? BASE_URL + "/login/cust" : BASE_URL + "/login/driver";
 
         btnLogin.setEnabled(false);
@@ -128,99 +106,176 @@ public class MainActivity extends AppCompatActivity {
         try {
             body.put("email", email);
             body.put("password", password);
-        } catch (JSONException e) {}
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
 
-        JsonObjectRequest request = new JsonObjectRequest(
-                Request.Method.POST,
-                url,
-                body,
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, body,
                 response -> {
                     try {
-                        int id = isUser ? response.getInt("custId") : response.getInt("driverId");
+                        int userId = isUser ? response.getInt("custId") : response.getInt("driverId");
 
-                        saveSession(id, isUser);
-                        Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
-                        launchCorrectHomeScreen();
+                        // Save session first
+                        saveSession(userId, isUser);
+
+                        // Now fetch full profile from server
+                        fetchUserProfile(userId, isUser);
+
                     } catch (JSONException e) {
-                        Toast.makeText(this, "Response error", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Login failed", Toast.LENGTH_SHORT).show();
+                        btnLogin.setEnabled(true);
+                        btnLogin.setText("Login");
                     }
                 },
                 error -> {
                     String msg = "Invalid email or password";
-
                     if (error.networkResponse != null && error.networkResponse.data != null) {
                         try {
-                            String res = new String(error.networkResponse.data);
+                            String res = new String(error.networkResponse.data, "utf-8");
                             JSONObject obj = new JSONObject(res);
                             msg = obj.optString("detail", msg);
                         } catch (Exception ignored) {}
                     }
-
                     Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
                     btnLogin.setEnabled(true);
                     btnLogin.setText("Login");
+                });
+
+        Volley.newRequestQueue(this).add(request);
+    }
+
+    // FIXED: Fetch profile for both User and Driver
+    private void fetchUserProfile(int userId, boolean isCustomer) {
+        String url = isCustomer
+                ? BASE_URL + "/profile/customer?custId=" + userId
+                : BASE_URL + "/profile/driver?driverId=" + userId;
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.GET, url, null,
+                response -> {
+                    try {
+                        if (isCustomer) {
+                            saveCustomerProfile(response);
+                        } else {
+                            saveDriverProfile(response);
+                        }
+
+                        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+                        btnLogin.setEnabled(true);
+                        btnLogin.setText("Login");
+                        launchCorrectHomeScreen();
+
+                    } catch (JSONException e) {
+                        Log.e("PROFILE", "Error parsing profile", e);
+                        // Still launch even if profile parsing fails
+                        Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+                        btnLogin.setEnabled(true);
+                        btnLogin.setText("Login");
+                        launchCorrectHomeScreen();
+                    }
+                },
+                error -> {
+                    Log.e("PROFILE", "Failed to load profile", error);
+                    // Still launch even if profile fetch fails
+                    Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("Login");
+                    launchCorrectHomeScreen();
                 }
         );
 
         Volley.newRequestQueue(this).add(request);
     }
 
-    private void saveSession(int userId, boolean isCustomer) {
-        SharedPreferences.Editor editor = sp.edit();
+    // Save customer profile to UserPrefs
+    private void saveCustomerProfile(JSONObject response) throws JSONException {
+        SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
 
-        editor.putBoolean("loggedIn", true);
-        editor.putBoolean("isUser", isCustomer);
-        editor.putInt("userId", userId);
+        editor.putString("fullName", response.getString("fullname"));
+        editor.putString("email", response.getString("email"));
+        editor.putString("phone", response.getString("phone"));
+        editor.putString("gender", response.optString("gender", " "));
+        editor.putBoolean("isPremium", response.optBoolean("isPremium", false));
 
         editor.apply();
+        Log.d("LOGIN_PROFILE", "Customer profile saved to UserPrefs");
+    }
+
+    // Save driver profile to DriverPrefs (for DriverProfileActivity)
+    private void saveDriverProfile(JSONObject response) throws JSONException {
+        SharedPreferences prefs = getSharedPreferences("DriverPrefs", MODE_PRIVATE);
+        SharedPreferences.Editor editor = prefs.edit();
+
+        // Personal Information
+        editor.putString("fullName", response.getString("fullname"));
+        editor.putString("email", response.getString("email"));
+        editor.putString("phone", response.getString("phone"));
+        editor.putString("gender", response.optString("gender", " "));
+
+        // Vehicle Information
+        editor.putString("vehicleModel", response.optString("make", "Not set"));
+        editor.putString("licensePlate", response.optString("license", "Not set"));
+        editor.putString("vehicleColor", response.optString("color", "Not set"));
+        editor.putString("vehicleType", response.optString("vehicleType", "Car"));
+
+        // Statistics
+        editor.putInt("totalRides", response.optInt("totalRides", 0));
+        editor.putInt("acceptanceRate", response.optInt("acceptanceRate", 100));
+        editor.putBoolean("isPremium", response.optBoolean("isPremium", false));
+        editor.putBoolean("isLoggedIn", true);
+
+        editor.apply();
+        Log.d("LOGIN_PROFILE", "Driver profile saved to DriverPrefs");
+    }
+
+    private void saveSession(int userId, boolean isCustomer) {
+        sp.edit()
+                .putBoolean("loggedIn", true)
+                .putBoolean("isUser", isCustomer)
+                .putInt("userId", userId)
+                .apply();
     }
 
     private void launchCorrectHomeScreen() {
         boolean isCustomer = sp.getBoolean("isUser", true);
+        int userId = sp.getInt("userId", -1);
 
         Intent intent = isCustomer
                 ? new Intent(this, HomeScreenActivity.class)
                 : new Intent(this, DriverDashboard.class);
 
-        int id = sp.getInt("userId", -1);
-        intent.putExtra("id", id);
-
+        intent.putExtra("id", userId);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
         finish();
     }
 
     private void setupToggle() {
-        linearLayoutLoginUser.setOnClickListener(v -> {
-            isUser = true;
-            updateToggleUI();
-        });
-
-        linearLayoutLoginDriver.setOnClickListener(v -> {
-            isUser = false;
-            updateToggleUI();
-        });
-
+        linearLayoutLoginUser.setOnClickListener(v -> { isUser = true; updateToggleUI(); });
+        linearLayoutLoginDriver.setOnClickListener(v -> { isUser = false; updateToggleUI(); });
         updateToggleUI();
     }
 
     private void updateToggleUI() {
+        int selectedBg = R.drawable.bg_toggle_selected;
+        int unselectedBg = Color.TRANSPARENT;
+        int white = Color.WHITE;
+        int gray = Color.parseColor("#4B5563");
+
         if (isUser) {
-            linearLayoutLoginUser.setBackgroundResource(R.drawable.bg_toggle_selected);
-            tvLoginUser.setTextColor(Color.WHITE);
-            ivLoginUser.setColorFilter(Color.WHITE);
-
-            linearLayoutLoginDriver.setBackgroundColor(Color.TRANSPARENT);
-            tvLoginDriver.setTextColor(Color.parseColor("#4B5563"));
-            ivLoginDriver.setColorFilter(Color.parseColor("#4B5563"));
+            linearLayoutLoginUser.setBackgroundResource(selectedBg);
+            tvLoginUser.setTextColor(white);
+            ivLoginUser.setColorFilter(white);
+            linearLayoutLoginDriver.setBackgroundColor(unselectedBg);
+            tvLoginDriver.setTextColor(gray);
+            ivLoginDriver.setColorFilter(gray);
         } else {
-            linearLayoutLoginDriver.setBackgroundResource(R.drawable.bg_toggle_selected);
-            tvLoginDriver.setTextColor(Color.WHITE);
-            ivLoginDriver.setColorFilter(Color.WHITE);
-
-            linearLayoutLoginUser.setBackgroundColor(Color.TRANSPARENT);
-            tvLoginUser.setTextColor(Color.parseColor("#4B5563"));
-            ivLoginUser.setColorFilter(Color.parseColor("#4B5563"));
+            linearLayoutLoginDriver.setBackgroundResource(selectedBg);
+            tvLoginDriver.setTextColor(white);
+            ivLoginDriver.setColorFilter(white);
+            linearLayoutLoginUser.setBackgroundColor(unselectedBg);
+            tvLoginUser.setTextColor(gray);
+            ivLoginUser.setColorFilter(gray);
         }
     }
 }
