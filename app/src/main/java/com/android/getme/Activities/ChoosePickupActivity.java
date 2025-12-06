@@ -44,6 +44,7 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.getme.Adapters.PickupSearchAdapter;
 import com.android.getme.Adapters.TabPageAdapter;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.PickupSearchListener;
 import com.android.getme.Models.GHGeocodeResult;
 import com.android.getme.R;
@@ -57,7 +58,11 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
 import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.location.Priority;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.gson.Gson;
@@ -76,7 +81,7 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
 public class ChoosePickupActivity extends AppCompatActivity
-implements PickupSearchListener {
+        implements PickupSearchListener {
 
     private boolean LocationPermissionGranted = false;
     private String userAgent;
@@ -98,12 +103,21 @@ implements PickupSearchListener {
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    if(result.getResultCode() == RESULT_OK) {
+                    if (result.getResultCode() == RESULT_OK) {
                         // TODO: set data for dropoff, driverId, vehicleType, payment and rideId
-                        if(result.getData() != null) {
+                        if (result.getData() != null) {
                             Bundle b = result.getData().getExtras();
-                            if(b != null) {
+                            if (b != null) {
                                 Intent intent = new Intent();
+                                String status = b.getString("status");
+                                intent.putExtra("status", status);
+
+                                if (status.equals("Cancelled")) {
+                                    setResult(RESULT_OK, intent);
+                                    finish();
+                                }
+                                // TODO : check if status is cancelled
+
                                 int rideId = b.getInt("rideId");
                                 int driverId = b.getInt("driverId");
                                 intent.putExtra("rideId", rideId);
@@ -157,37 +171,57 @@ implements PickupSearchListener {
 
         // checking and requesting permission
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 1);
-        } else {
-            LocationPermissionGranted = true;
+            WarningDialogFragment.newInstance("Permission Error", "Location permission required for ride finding to work.")
+                            .show(getSupportFragmentManager(), "Permisssion Warning Dialog");
+            finish();
         }
 
-        if (LocationPermissionGranted) {
-            FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-            // if you see an error ignore it, the locationPermissionGranted already checks for location permission
-            fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
-                @Override
-                public void onSuccess(Location location) {
-                    if (location != null) {
-                        viewModel.currLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
-                        currLocationMarker = new Marker(map);
-                        currLocationMarker.setPosition(viewModel.currLocation);
-                        currLocationMarker.setInfoWindow(null);
-                        currLocationMarker.setIcon(ActivityCompat.getDrawable(ChoosePickupActivity.this, R.drawable.my_location_24px));
-                        mapController.setCenter(viewModel.currLocation);
-                        map.getOverlays().add(currLocationMarker);
-                        map.invalidate();
-                        setCurrentLocationAddress();
-                    }
-                }
-            }).addOnFailureListener(new OnFailureListener() {
-                @Override
-                public void onFailure(@NonNull Exception e) {
-                    e.printStackTrace();
-                }
-            });
-        }
         initializeViewComponents();
+
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        // if you see an error ignore it, the locationPermissionGranted already checks for location permission
+        fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
+            @Override
+            public void onSuccess(Location location) {
+                if (location != null) {
+                    viewModel.currLocation = new GeoPoint(location.getLatitude(), location.getLongitude());
+                    currLocationMarker = new Marker(map);
+                    currLocationMarker.setPosition(viewModel.currLocation);
+                    currLocationMarker.setInfoWindow(null);
+                    currLocationMarker.setIcon(ActivityCompat.getDrawable(ChoosePickupActivity.this, R.drawable.my_location_24px));
+                    mapController.setCenter(viewModel.currLocation);
+                    map.getOverlays().add(currLocationMarker);
+                    map.invalidate();
+                    setCurrentLocationAddress();
+                } else {
+                    LocationRequest locationRequest = new LocationRequest.Builder(Priority.PRIORITY_HIGH_ACCURACY, 10000)
+                            .setMinUpdateIntervalMillis(5000)
+                                    .build();
+                    LocationCallback locationCallback = new LocationCallback() {
+                        @Override
+                        public void onLocationResult(@NonNull LocationResult locationResult) {
+                            if(locationResult == null) {
+                                return;
+                            }
+                            onSuccess(locationResult.getLocations().get(-1));
+                        }
+                    };
+                    try{
+                        fusedLocationClient.requestLocationUpdates(locationRequest,locationCallback,
+                                Looper.getMainLooper());
+                    } catch (SecurityException e) {
+                        e.printStackTrace();
+                    }
+
+                }
+            }
+        }).addOnFailureListener(new OnFailureListener() {
+            @Override
+            public void onFailure(@NonNull Exception e) {
+                WarningDialogFragment.newInstance("Network Error", "Could not get location")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
+            }
+        });
 
         initializeListeners();
     }
@@ -205,14 +239,18 @@ implements PickupSearchListener {
         pickupCurrLocLinlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                pickupMarker = new Marker(map);
-                pickupMarker.setPosition(viewModel.currLocation);
-                pickupMarker.setInfoWindow(null);
-                map.getOverlays().add(pickupMarker);
-                map.invalidate();
                 viewModel.pickupLocation = viewModel.currLocation;
                 viewModel.pickupName = pickupCurrLocAddress.getText().toString();
                 viewModel.pickupAddress = pickupCurrLocAddress.getText().toString();
+
+                pickupMarker = new Marker(map);
+                pickupMarker.setPosition(viewModel.currLocation);
+                pickupMarker.setTitle(viewModel.pickupName);
+                pickupMarker.setSubDescription(viewModel.pickupAddress);
+                pickupMarker.setIcon(ActivityCompat.getDrawable(ChoosePickupActivity.this, R.drawable.pickup_icon));
+                map.getOverlays().add(pickupMarker);
+                map.invalidate();
+
                 // start pick dropoff activity
                 launchDropoffActivity();
             }
@@ -221,7 +259,7 @@ implements PickupSearchListener {
         pickupSearchEditText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
-                if(i == EditorInfo.IME_ACTION_DONE || i == EditorInfo.IME_ACTION_SEARCH) {
+                if (i == EditorInfo.IME_ACTION_DONE || i == EditorInfo.IME_ACTION_SEARCH) {
 //                    Toast.makeText(ChoosePickupActivity.this, pickupSearchEditText.getText(), Toast.LENGTH_SHORT).show();
 
                     RequestQueue queue = Volley.newRequestQueue(ChoosePickupActivity.this);
@@ -287,7 +325,8 @@ implements PickupSearchListener {
                         theAddress = sb.toString();
                     }
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    WarningDialogFragment.newInstance("Location Error", "Could not get current location")
+                            .show(getSupportFragmentManager(), "Location Warning Dialog");
                 }
                 Message msg = handler.obtainMessage();
                 Bundle bundle = new Bundle();
@@ -320,34 +359,20 @@ implements PickupSearchListener {
     }
 
     @Override
-    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-        if (grantResults.length > 0 && permissions[0] == Manifest.permission.ACCESS_FINE_LOCATION &&
-                grantResults[0] == PackageManager.PERMISSION_GRANTED && requestCode == 1) {
-            LocationPermissionGranted = true;
-        }
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-    }
-
-    private boolean isConnected() {
-        ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
-        if(networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
-        return false;
-    }
-
-    @Override
     public void onPickupSearchItemClicked(String name, String address, double lat, double lng) {
         pickupSearchEditText.setText(name);
-        if(pickupMarker != null) {
+        if (pickupMarker != null) {
             map.getOverlays().remove(pickupMarker);
-        }else {
+        } else {
             pickupMarker = new Marker(map);
         }
         pickupMarker.setPosition(new GeoPoint(lat, lng));
+        pickupMarker.setIcon(ActivityCompat.getDrawable(this, R.drawable.pickup_icon));
+        pickupMarker.setTitle(name);
+        pickupMarker.setSubDescription(address);
         map.getOverlays().add(pickupMarker);
         mapController.setCenter(new GeoPoint(lat, lng));
+        mapController.setZoom(2.0);
         map.invalidate();
         viewModel.pickupLocation = new GeoPoint(lat, lng);
 
@@ -359,8 +384,6 @@ implements PickupSearchListener {
     }
 
     private void launchDropoffActivity() {
-
-
         Intent intent = new Intent(ChoosePickupActivity.this, ChooseDropoffActivity.class);
         intent.putExtra("vehicleType", viewModel.vehicleType);
         intent.putExtra("pickupLat", viewModel.pickupLocation.getLatitude());

@@ -27,6 +27,7 @@
 
     <!-- Trip History Card -->
     <androidx.cardview.widget.CardView
+        android:id="@+id/driverTripHistory"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginBottom="16dp"

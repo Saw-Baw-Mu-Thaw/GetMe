@@ -6,6 +6,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -21,9 +22,11 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.R;
 import com.android.getme.ViewModels.ChooseVehicleViewModel;
 
+import org.osmdroid.bonuspack.routing.GraphHopperRoadManager;
 import org.osmdroid.bonuspack.routing.OSRMRoadManager;
 import org.osmdroid.bonuspack.routing.Road;
 import org.osmdroid.bonuspack.routing.RoadManager;
@@ -62,10 +65,21 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                         Bundle b = result.getData().getExtras();
                         if(b != null) {
                             Intent intent = new Intent();
+
+                            String status = b.getString("status");
+                            intent.putExtra("status", status);
+                            // TODO : check status is cancelled
+                            if(status.equals("Cancelled")) {
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
+
                             int rideId = b.getInt("rideId");
                             int driverId = b.getInt("driverId");
+
                             intent.putExtra("rideId", rideId);
                             intent.putExtra("driverId", driverId);
+
                             intent.putExtra("payment", viewModel.payment);
                             intent.putExtra("amount", viewModel.amount);
                             intent.putExtra("distance", viewModel.distance);
@@ -93,7 +107,7 @@ public class ChooseVehicleActivity extends AppCompatActivity {
 
         setPrice();
 
-        setChoice();
+//        setChoice();
 
         initializeListeners();
     }
@@ -161,7 +175,6 @@ public class ChooseVehicleActivity extends AppCompatActivity {
             public void onClick(View view) {
                 if(viewModel.chosenVehicleType != 0) {
                     // start FindDriver Activity
-//                    Toast.makeText(ChooseVehicleActivity.this, "Will book a ride soon", Toast.LENGTH_SHORT).show();
                     Intent intent = new Intent(ChooseVehicleActivity.this, FindDriverActivity.class);
                     intent.putExtra("vehicleType", viewModel.vehicleType);
                     intent.putExtra("pickupLat", viewModel.pickupLocation.getLatitude());
@@ -180,7 +193,8 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                     startForResult.launch(intent);
 
                 }else {
-                    Toast.makeText(ChooseVehicleActivity.this, "Please Choose a Vehicle Type", Toast.LENGTH_SHORT).show();
+                    WarningDialogFragment.newInstance("Warning", "Please Choose a Vehicle Type")
+                            .show(getSupportFragmentManager(), "Vehicle Warning Dialog");
                 }
             }
         });
@@ -194,9 +208,13 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                 double distance = bundle.getDouble("distance");
                 double duration = bundle.getDouble("duration");
 
-                int economyPrice = (((int) Math.round(distance * 80000.0) / 1000) * 1000);
-                int standardPrice = (((int) Math.round(distance * 100000.0) / 1000) * 1000);
-                int bikePrice = (((int)Math.round(distance * 50000.0) / 1000) * 1000);
+                int economyRate = Integer.parseInt(ActivityCompat.getString(ChooseVehicleActivity.this, R.string.economy_rate));
+                int standardRate = Integer.parseInt(ActivityCompat.getString(ChooseVehicleActivity.this, R.string.standard_rate));
+                int bikeRate = Integer.parseInt(ActivityCompat.getString(ChooseVehicleActivity.this, R.string.bike_rate));
+
+                int economyPrice = (((int) Math.round(distance * economyRate) / 1000) * 1000);
+                int standardPrice = (((int) Math.round(distance * standardRate) / 1000) * 1000);
+                int bikePrice = (((int)Math.round(distance * bikeRate) / 1000) * 1000);
 
                 String economy = economyPrice+" VND";
                 String standard = standardPrice+" VND";
@@ -219,6 +237,8 @@ public class ChooseVehicleActivity extends AppCompatActivity {
 
                 viewModel.duration = ((int)duration) / 60; // we save in minutes
                 viewModel.distance = distance;
+
+                setChoice();
                 super.handleMessage(msg);
             }
         };
@@ -227,15 +247,37 @@ public class ChooseVehicleActivity extends AppCompatActivity {
         executorService.submit(new Runnable() {
             @Override
             public void run() {
-                RoadManager roadManager = new OSRMRoadManager(ChooseVehicleActivity.this, userAgent);
+                String provider = ActivityCompat.getString(ChooseVehicleActivity.this, R.string.provider);
+
+                RoadManager roadManager;
+                if(provider.equals("OSRM")) {
+                    roadManager = new OSRMRoadManager(ChooseVehicleActivity.this, userAgent);
+                    ((OSRMRoadManager) roadManager).setMean(OSRMRoadManager.MEAN_BY_CAR);
+                } else {
+                    String api_key = ActivityCompat.getString(ChooseVehicleActivity.this, R.string.GH_key);
+                    roadManager = new GraphHopperRoadManager(api_key, false);
+                    roadManager.addRequestOption("profile=car");
+                    roadManager.addRequestOption("snap_prevention=motorway");
+                    roadManager.addRequestOption("snap_prevention=ferry");
+                    roadManager.addRequestOption("snap_prevention=tunnel");
+                    roadManager.addRequestOption("locale=en");
+                }
+
                 ArrayList<GeoPoint> waypoints = new ArrayList<>();
                 waypoints.add(viewModel.pickupLocation);
                 waypoints.add(viewModel.dropoffLocation);
 
-                ((OSRMRoadManager) roadManager).setMean(OSRMRoadManager.MEAN_BY_CAR);
-
                 Road road = roadManager.getRoad(waypoints);
-                if (road.mStatus == Road.STATUS_OK) {
+
+                if(road.mStatus == Road.STATUS_INVALID) {
+                    WarningDialogFragment.newInstance("Status Invalid", "Road does not exist to those location")
+                            .show(getSupportFragmentManager(), "Road Warning Dialog");
+//                    finish();
+                } else if(road.mStatus == Road.STATUS_TECHNICAL_ISSUE) {
+                    WarningDialogFragment.newInstance("Technical Issues", "Location provider is having some issues.")
+                            .show(getSupportFragmentManager(), "Road Warning Dialog");
+//                    finish();
+                } else if (road.mStatus == Road.STATUS_OK) {
                     Message msg = handler.obtainMessage();
                     Bundle bundle = new Bundle();
                     bundle.putDouble("distance", road.mLength);

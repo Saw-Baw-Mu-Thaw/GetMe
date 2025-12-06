@@ -5,10 +5,10 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="#F8FAFC"> <!-- Slate-50 -->
+    android:background="#F8FAFC">
 
-    <!-- Shared Header Section -->
     <RelativeLayout
+        android:id="@+id/layoutHeader"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#2563EB"
@@ -35,8 +35,8 @@
                 android:textSize="12sp" />
         </LinearLayout>
 
-        <!-- Profile Image Placeholder -->
         <androidx.cardview.widget.CardView
+            android:id="@+id/btnEarnings"
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_alignParentEnd="true"
@@ -49,12 +49,12 @@
                 android:layout_height="match_parent"
                 android:src="@android:drawable/ic_menu_gallery"
                 android:scaleType="centerCrop"
-                android:tint="#64748B"/>
+                app:tint="#64748B"/>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
-    <!-- Shared Status Bar & Switch -->
     <LinearLayout
+        android:id="@+id/layoutStatus"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#FFFFFF"
@@ -68,6 +68,7 @@
             android:layout_marginBottom="16dp">
 
             <TextView
+                android:id="@+id/lblDriverStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Driver Status"
@@ -86,7 +87,6 @@
                 android:textColor="#94A3B8"/>
         </RelativeLayout>
 
-        <!-- The Switch -->
         <com.google.android.material.switchmaterial.SwitchMaterial
             android:id="@+id/switchStatus"
             android:layout_width="wrap_content"
@@ -97,7 +97,6 @@
 
     </LinearLayout>
 
-    <!-- FRAGMENT CONTAINER -->
     <FrameLayout
         android:id="@+id/fragment_container"
         android:layout_width="match_parent"

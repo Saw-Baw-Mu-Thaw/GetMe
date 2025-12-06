@@ -27,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.getme.Adapters.PickupSearchAdapter;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.PickupSearchListener;
 import com.android.getme.Models.GHGeocodeResult;
 import com.android.getme.R;
@@ -76,6 +77,15 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
                         Bundle b = result.getData().getExtras();
                         if(b != null) {
                             Intent intent = new Intent();
+                            String status = b.getString("status");
+                            // TODO : check if status is cancelled
+                            intent.putExtra("status", status);
+
+                            if(status.equals("Cancelled")) {
+                                setResult(RESULT_OK, intent);
+                                finish();
+                            }
+
                             int rideId = b.getInt("rideId");
                             int driverId = b.getInt("driverId");
                             intent.putExtra("rideId", rideId);
@@ -88,6 +98,7 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
                             double distance = b.getDouble("distance");
                             intent.putExtra("distance", distance);
                             intent.putExtra("duration", duration);
+
 
                             intent.putExtra("dropoffLat", viewModel.dropoffLocation.getLatitude());
                             intent.putExtra("dropoffLng", viewModel.dropoffLocation.getLongitude());
@@ -173,7 +184,8 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
             public void onClick(View view) {
                 if(viewModel.dropoffLocation == null) {
                     // TODO : replace with alert dialog
-                    Toast.makeText(ChooseDropoffActivity.this, "Destination not selected", Toast.LENGTH_SHORT).show();
+                    WarningDialogFragment.newInstance("Destination Error", "Destionation not selected")
+                            .show(getSupportFragmentManager(), "Destination Warning Dialog");
                     return;
                 }
                 Intent intent = new Intent(ChooseDropoffActivity.this, ChooseVehicleActivity.class);
@@ -200,6 +212,9 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
 
         pickupMarker = new Marker(map);
         pickupMarker.setPosition(viewModel.pickupLocation);
+        pickupMarker.setTitle(viewModel.pickupName);
+        pickupMarker.setSubDescription(viewModel.pickupAddress);
+        pickupMarker.setIcon(ActivityCompat.getDrawable(this, R.drawable.pickup_icon));
         map.getOverlays().add(pickupMarker);
         map.invalidate();
 
@@ -235,6 +250,11 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
         }
         dropoffMarker = new Marker(map);
         dropoffMarker.setPosition(viewModel.dropoffLocation);
+        dropoffMarker.setTitle(name);
+        dropoffMarker.setSubDescription(address);
+        dropoffMarker.setIcon(ActivityCompat.getDrawable(this, R.drawable.dropoff_icon));
+        mapController.setCenter(new GeoPoint(lat,lng));
+        mapController.setZoom(15.0);
         map.getOverlays().add(dropoffMarker);
         map.invalidate();
         adapter.setSearchResults(new ArrayList<>());
