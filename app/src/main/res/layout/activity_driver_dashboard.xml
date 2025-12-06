@@ -47,9 +47,8 @@
                 android:id="@+id/ivDriverProfile"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
-                android:src="@android:drawable/ic_menu_gallery"
-                android:scaleType="centerCrop"
-                app:tint="#64748B"/>
+                android:src="@drawable/driver"
+                android:scaleType="centerCrop"/>
         </androidx.cardview.widget.CardView>
     </RelativeLayout>
 
