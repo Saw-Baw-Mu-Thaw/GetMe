@@ -192,6 +192,13 @@ public class AnimatedMapFragment extends Fragment {
                 car.setInfoWindow(null);
                 map.getOverlays().add(car);
                 map.invalidate();
+
+                // --- ADD THIS BLOCK ---
+                // This is the trigger that tells DriverDashboard to change the text
+                if (listener != null) {
+                    listener.OnArrivalAnimationCompleted();
+                }
+                // ----------------------
             }
         });
 

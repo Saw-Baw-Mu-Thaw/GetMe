@@ -19,6 +19,9 @@
         android:theme="@style/Theme.GetMe"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".Activities.TripHistoryActivity"
+            android:exported="false" />
+        <activity
             android:name=".Activities.RideCompleteActivity"
             android:exported="false" />
         <activity
@@ -28,7 +31,7 @@
             android:name=".Activities.DriverRideHistoryActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.MainActivity"
+            android:name=".Activities.DriverDashboard"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -58,8 +61,8 @@
             android:name=".Activities.HomeScreenActivity"
             android:exported="false" />
         <activity
-            android:name=".Activities.DriverDashboard"
-            android:exported="true"></activity>
+            android:name=".Activities.MainActivity"
+            android:exported="true" />
         <activity
             android:name=".Activities.RegisterDriverActivity"
             android:exported="false" />

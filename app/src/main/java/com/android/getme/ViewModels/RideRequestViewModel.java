@@ -1,67 +1,48 @@
 package com.android.getme.ViewModels;
 
 public class RideRequestViewModel {
-    String name;
-    String rating;
-    String price;
-    String distance;
-    String pickupLocation;
-    String dropoffLocation;
+    private int rideId;
+    private String name;
+    private String rating;
+    private String price;
+    private String distance;
+    private String pickupLocation;
+    private String dropoffLocation;
 
-    public RideRequestViewModel(String name, String rating, String price, String distance, String pickupLocation, String dropoffLocation) {
+    // --- New Fields for Coordinates ---
+    private double pickupLat;
+    private double pickupLng;
+    private double dropoffLat;
+    private double dropoffLng;
+
+    public RideRequestViewModel(int rideId, String name, String rating, String price, String distance,
+                                String pickupLocation, String dropoffLocation,
+                                double pickupLat, double pickupLng, double dropoffLat, double dropoffLng) {
+        this.rideId = rideId;
         this.name = name;
         this.rating = rating;
         this.price = price;
         this.distance = distance;
         this.pickupLocation = pickupLocation;
         this.dropoffLocation = dropoffLocation;
+        // Store coordinates
+        this.pickupLat = pickupLat;
+        this.pickupLng = pickupLng;
+        this.dropoffLat = dropoffLat;
+        this.dropoffLng = dropoffLng;
     }
 
-    public String getName() {
-        return name;
-    }
+    // --- Getters ---
+    public int getRideId() { return rideId; }
+    public String getName() { return name; }
+    public String getRating() { return rating; }
+    public String getPrice() { return price; }
+    public String getDistance() { return distance; }
+    public String getPickupLocation() { return pickupLocation; }
+    public String getDropoffLocation() { return dropoffLocation; }
 
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public String getRating() {
-        return rating;
-    }
-
-    public void setRating(String rating) {
-        this.rating = rating;
-    }
-
-    public String getPrice() {
-        return price;
-    }
-
-    public void setPrice(String price) {
-        this.price = price;
-    }
-
-    public String getDistance() {
-        return distance;
-    }
-
-    public void setDistance(String distance) {
-        this.distance = distance;
-    }
-
-    public String getPickupLocation() {
-        return pickupLocation;
-    }
-
-    public void setPickupLocation(String pickupLocation) {
-        this.pickupLocation = pickupLocation;
-    }
-
-    public String getDropoffLocation() {
-        return dropoffLocation;
-    }
-
-    public void setDropoffLocation(String dropoffLocation) {
-        this.dropoffLocation = dropoffLocation;
-    }
+    public double getPickupLat() { return pickupLat; }
+    public double getPickupLng() { return pickupLng; }
+    public double getDropoffLat() { return dropoffLat; }
+    public double getDropoffLng() { return dropoffLng; }
 }
