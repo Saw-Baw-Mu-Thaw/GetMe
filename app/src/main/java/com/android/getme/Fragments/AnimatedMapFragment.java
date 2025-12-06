@@ -183,6 +183,13 @@ public class AnimatedMapFragment extends Fragment {
             public void onAnimationEnd(Animator animation) {
                 mAnimationEnded = true;
                 map.invalidate();
+
+                // --- ADD THIS BLOCK ---
+                // This is the trigger that tells DriverDashboard to change the text
+                if (listener != null) {
+                    listener.OnArrivalAnimationCompleted();
+                }
+                // ----------------------
             }
         });
 

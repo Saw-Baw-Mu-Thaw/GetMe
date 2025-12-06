@@ -1,7 +1,9 @@
 package com.android.getme.Adapters;
+
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,9 +16,17 @@ import java.util.List;
 public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.ViewHolder> {
 
     private List<RideRequestViewModel> rideList;
+    private OnRideActionListener listener;
 
-    public RideRequestAdapter(List<RideRequestViewModel> rideList) {
+    // Interface to pass the click event back to the Fragment
+    public interface OnRideActionListener {
+        void onAcceptClick(int rideId);
+    }
+
+    // Updated Constructor to accept the listener
+    public RideRequestAdapter(List<RideRequestViewModel> rideList, OnRideActionListener listener) {
         this.rideList = rideList;
+        this.listener = listener;
     }
 
     @NonNull
@@ -36,6 +46,13 @@ public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.
         holder.tvDistance.setText(ride.getDistance());
         holder.tvPickup.setText(ride.getPickupLocation());
         holder.tvDropoff.setText(ride.getDropoffLocation());
+
+        // Handle Accept Button Click
+        holder.btnAccept.setOnClickListener(v -> {
+            if (listener != null) {
+                listener.onAcceptClick(ride.getRideId());
+            }
+        });
     }
 
     @Override
@@ -45,6 +62,7 @@ public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvRating, tvPrice, tvDistance, tvPickup, tvDropoff;
+        Button btnAccept; // Added Button
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -54,6 +72,9 @@ public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.
             tvDistance = itemView.findViewById(R.id.tvDistance);
             tvPickup = itemView.findViewById(R.id.tvPickup);
             tvDropoff = itemView.findViewById(R.id.tvDropoff);
+
+            // Ensure your XML (ride_item_online.xml) has a Button with this ID
+            btnAccept = itemView.findViewById(R.id.btnAccept);
         }
     }
 }

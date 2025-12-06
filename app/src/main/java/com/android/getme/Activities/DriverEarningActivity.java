@@ -41,7 +41,7 @@ public class DriverEarningActivity extends AppCompatActivity {
     private TextView txtTotalTrips;
 
     // TODO: Dynamic Driver ID
-    private static final int DRIVER_ID = 1;
+    private static final int DRIVER_ID = 2;
     // Base URL for Emulator (10.0.2.2)
     private static final String BASE_URL = "http://10.0.2.2:8000";
 

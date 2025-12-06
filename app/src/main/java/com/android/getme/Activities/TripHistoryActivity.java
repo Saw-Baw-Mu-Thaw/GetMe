@@ -35,7 +35,7 @@ public class TripHistoryActivity extends AppCompatActivity {
     private List<Object> items;
 
     // TODO: Change '2' to the actual logged-in driver's ID dynamically
-    private static final int DRIVER_ID = 1;
+    private static final int DRIVER_ID = 2;
 
     // NOTE: '10.0.2.2' is the localhost alias for Android Emulator.
     // Use your computer's actual IP (e.g., 192.168.1.x) if testing on a real phone.
