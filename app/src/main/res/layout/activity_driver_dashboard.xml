@@ -44,6 +44,7 @@
             app:cardBackgroundColor="#E2E8F0">
 
             <ImageView
+                android:id="@+id/ivDriverProfile"
                 android:layout_width="match_parent"
                 android:layout_height="match_parent"
                 android:src="@android:drawable/ic_menu_gallery"

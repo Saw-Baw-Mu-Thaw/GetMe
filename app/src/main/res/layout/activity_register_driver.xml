@@ -547,6 +547,35 @@
                     app:rippleColor="#80FFFFFF" />
 
             </LinearLayout>
+
+            <LinearLayout
+                android:id="@+id/linearLayoutAsk"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="40dp"
+                android:gravity="center_horizontal"
+                android:orientation="vertical">
+
+                <TextView
+                    android:id="@+id/tvAsk"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:text="Already have an account!"
+                    android:textColor="#4B5563"
+                    android:textSize="14sp" />
+
+                <TextView
+                    android:id="@+id/tvDriverSignin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Sign In"
+                    android:textColor="#2563EB"
+                    android:textSize="16sp"
+                    android:textStyle="bold" />
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

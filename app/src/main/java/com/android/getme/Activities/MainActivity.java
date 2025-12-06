@@ -4,41 +4,73 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.android.getme.R;
 import com.android.volley.Request;
-import com.android.volley.toolbox.StringRequest;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.android.material.button.MaterialButton;
 
-import java.util.HashMap;
-import java.util.Map;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class MainActivity extends AppCompatActivity {
 
-    LinearLayout linearLayoutLoginUser, linearLayoutLoginDriver;
-    TextView tvLoginUser, tvLoginDriver;
-    ImageView ivLoginUser, ivLoginDriver;
-    EditText edtLoginEmail, edtLoginPassword;
-    MaterialButton btnLogin;
+    private LinearLayout linearLayoutLoginUser, linearLayoutLoginDriver;
+    private TextView tvLoginUser, tvLoginDriver, tvRegister;
+    private ImageView ivLoginUser, ivLoginDriver;
+    private EditText edtLoginEmail, edtLoginPassword;
+    private MaterialButton btnLogin;
 
-    boolean isUser = true;
-    String BASE_URL = "http://your.address";
+    private boolean isUser = true;
+    private static final String BASE_URL = "http://10.0.2.2:8000"; // Your IP
 
+    private SharedPreferences sp;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        sp = getSharedPreferences("SESSION", MODE_PRIVATE);
+
+        // Auto login if saved
+        if (sp.getBoolean("loggedIn", false)) {
+            launchCorrectHomeScreen();
+            return;
+        }
+
         setContentView(R.layout.activity_login);
 
+        initViews();
+        setupToggle();
+
+        btnLogin.setOnClickListener(v -> validateAndLogin());
+
+        tvRegister.setOnClickListener(v -> {
+            Intent intent;
+            if (isUser) {
+                intent = new Intent(MainActivity.this, RegisterUserActivity.class);
+            } else {
+                intent = new Intent(MainActivity.this, RegisterDriverActivity.class);
+            }
+            startActivity(intent);
+        });
+
+        if (getIntent().getBooleanExtra("OPEN_AS_DRIVER", false)) {
+            isUser = false;
+            updateToggleUI();
+        }
+    }
+
+    private void initViews() {
         linearLayoutLoginUser = findViewById(R.id.linearLayoutLoginUser);
         linearLayoutLoginDriver = findViewById(R.id.linearLayoutLoginDriver);
         tvLoginUser = findViewById(R.id.tvLoginUser);
@@ -48,114 +80,138 @@ public class MainActivity extends AppCompatActivity {
         edtLoginEmail = findViewById(R.id.edtLoginEmail);
         edtLoginPassword = findViewById(R.id.edtLoginPassword);
         btnLogin = findViewById(R.id.btnLogin);
-
-        setupToggle();
-        btnLogin.setOnClickListener(v -> validateLogin());
-
+        tvRegister = findViewById(R.id.tvRegister);
     }
 
-    private void validateLogin() {
-
+    private void validateAndLogin() {
         String email = edtLoginEmail.getText().toString().trim();
         String password = edtLoginPassword.getText().toString().trim();
 
-        if (email.isEmpty()){
-            edtLoginEmail.setError("Email cannot be blank");
+        if (email.isEmpty()) {
+            edtLoginEmail.setError("Enter email");
+            edtLoginEmail.requestFocus();
+            return;
+        }
+
+        if (!android.util.Patterns.EMAIL_ADDRESS.matcher(email).matches()) {
+            edtLoginEmail.setError("Invalid email");
+            edtLoginEmail.requestFocus();
             return;
         }
 
         if (password.isEmpty()) {
-            edtLoginPassword.setError(("Password is required"));
+            edtLoginPassword.setError("Enter password");
+            edtLoginPassword.requestFocus();
             return;
         }
 
-        loginToServer(email, password);
-
+        performLogin(email, password);
     }
 
-    private void loginToServer(String email, String password) {
-        String url = isUser
-                ? BASE_URL + "/login/cust"
-                : BASE_URL + "/login/driver";
+    private void performLogin(String email, String password) {
 
-        StringRequest req = new StringRequest(Request.Method.POST, url,
+        String url = isUser ? BASE_URL + "/login/cust" : BASE_URL + "/login/driver";
+
+        btnLogin.setEnabled(false);
+        btnLogin.setText("Logging in...");
+
+        JSONObject body = new JSONObject();
+        try {
+            body.put("email", email);
+            body.put("password", password);
+        } catch (JSONException e) {}
+
+        JsonObjectRequest request = new JsonObjectRequest(
+                Request.Method.POST,
+                url,
+                body,
                 response -> {
-
                     try {
-                        int userId = Integer.parseInt(response);
-                        saveSession(userId);
+                        int id = isUser ? response.getInt("custId") : response.getInt("driverId");
 
-                        Toast.makeText(this, "Login Success", Toast.LENGTH_SHORT).show();
-
-                        if (isUser) {
-                            startActivity(new Intent(this, HomeScreenActivity.class).putExtra("id", 1));
-                        } else {
-                            // startActivity(new Intent(this, DriverHomeScreenActivty.class));
-                        }
-
-                        finish();
-
-                    } catch (Exception e) {
-                        Toast.makeText(this, "Login Failed", Toast.LENGTH_SHORT).show();
+                        saveSession(id, isUser);
+                        Toast.makeText(this, "Login Successful!", Toast.LENGTH_SHORT).show();
+                        launchCorrectHomeScreen();
+                    } catch (JSONException e) {
+                        Toast.makeText(this, "Response error", Toast.LENGTH_SHORT).show();
                     }
                 },
+                error -> {
+                    String msg = "Invalid email or password";
 
-                error -> Toast.makeText(this, "Invalid email or password", Toast.LENGTH_LONG).show()
-        ) {
-            protected Map<String, String> getParams() {
-                Map<String, String> map = new HashMap<>();
-                map.put("email", email);
-                map.put("password", password);
-                return map;
-            }
-        };
+                    if (error.networkResponse != null && error.networkResponse.data != null) {
+                        try {
+                            String res = new String(error.networkResponse.data);
+                            JSONObject obj = new JSONObject(res);
+                            msg = obj.optString("detail", msg);
+                        } catch (Exception ignored) {}
+                    }
 
-        Volley.newRequestQueue(this).add(req);
+                    Toast.makeText(this, msg, Toast.LENGTH_LONG).show();
+                    btnLogin.setEnabled(true);
+                    btnLogin.setText("Login");
+                }
+        );
+
+        Volley.newRequestQueue(this).add(request);
     }
 
-    private void saveSession(int userId) {
-        SharedPreferences sp = getSharedPreferences("SESSION", MODE_PRIVATE);
-        sp.edit()
-                .putBoolean("loggedIn", true)
-                .putBoolean("isUser", isUser)
-                .putInt("userId", userId)
-                .apply();
+    private void saveSession(int userId, boolean isCustomer) {
+        SharedPreferences.Editor editor = sp.edit();
 
+        editor.putBoolean("loggedIn", true);
+        editor.putBoolean("isUser", isCustomer);
+        editor.putInt("userId", userId);
+
+        editor.apply();
+    }
+
+    private void launchCorrectHomeScreen() {
+        boolean isCustomer = sp.getBoolean("isUser", true);
+
+        Intent intent = isCustomer
+                ? new Intent(this, HomeScreenActivity.class)
+                : new Intent(this, DriverDashboard.class);
+
+        int id = sp.getInt("userId", -1);
+        intent.putExtra("id", id);
+
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+        finish();
     }
 
     private void setupToggle() {
         linearLayoutLoginUser.setOnClickListener(v -> {
             isUser = true;
-            setToggleUI();
+            updateToggleUI();
         });
 
-        linearLayoutLoginDriver.setOnClickListener(v ->{
+        linearLayoutLoginDriver.setOnClickListener(v -> {
             isUser = false;
-            setToggleUI();
+            updateToggleUI();
         });
 
-        setToggleUI();
+        updateToggleUI();
     }
 
-    private void setToggleUI() {
+    private void updateToggleUI() {
         if (isUser) {
-            //when user selects
             linearLayoutLoginUser.setBackgroundResource(R.drawable.bg_toggle_selected);
             tvLoginUser.setTextColor(Color.WHITE);
             ivLoginUser.setColorFilter(Color.WHITE);
 
             linearLayoutLoginDriver.setBackgroundColor(Color.TRANSPARENT);
             tvLoginDriver.setTextColor(Color.parseColor("#4B5563"));
-            ivLoginDriver.setColorFilter((Color.parseColor("#4B5563")));
+            ivLoginDriver.setColorFilter(Color.parseColor("#4B5563"));
         } else {
-            //when driver selects
             linearLayoutLoginDriver.setBackgroundResource(R.drawable.bg_toggle_selected);
             tvLoginDriver.setTextColor(Color.WHITE);
             ivLoginDriver.setColorFilter(Color.WHITE);
 
             linearLayoutLoginUser.setBackgroundColor(Color.TRANSPARENT);
             tvLoginUser.setTextColor(Color.parseColor("#4B5563"));
-            ivLoginUser.setColorFilter((Color.parseColor("#4B5563")));
+            ivLoginUser.setColorFilter(Color.parseColor("#4B5563"));
         }
     }
 }

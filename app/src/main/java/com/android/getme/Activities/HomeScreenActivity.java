@@ -20,6 +20,7 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.android.getme.Fragments.ActivityFragment;
 import com.android.getme.Fragments.HomeScreenFragment;
+import com.android.getme.Fragments.UserProfileFragment;
 import com.android.getme.Listeners.CustHomeFragListener;
 import com.android.getme.R;
 import com.android.getme.ViewModels.CustRideViewModel;
@@ -135,8 +136,10 @@ public class HomeScreenActivity extends AppCompatActivity implements
         profileScreenLinlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showToast("Profile screen will be shown here");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.homeScreenFragContainer, new UserProfileFragment()).commit();
             }
+
         });
     }
 
