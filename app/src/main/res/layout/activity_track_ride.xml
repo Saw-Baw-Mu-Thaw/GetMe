@@ -107,12 +107,14 @@
                             android:textStyle="bold"
                             android:text="Michael Johnson"/>
 
-                        <TextView
-                            android:id="@+id/trackDriverRatingTextView"
-                            android:layout_width="wrap_content"
+                        <RatingBar
+                            android:id="@+id/trackDriverRatingBar"
                             android:layout_height="wrap_content"
-                            android:textSize="13sp"
-                            android:text="Rating : 4.9 (245 Rides)"/>
+                            android:layout_width="wrap_content"
+                            android:numStars="5"
+                            style="@style/driverRatingBar"
+                            android:stepSize="1.0"
+                            android:clickable="false"/>
                     </LinearLayout>
                 </LinearLayout>
 

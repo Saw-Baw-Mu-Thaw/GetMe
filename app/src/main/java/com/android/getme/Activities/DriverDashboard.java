@@ -3,6 +3,7 @@ package com.android.getme.Activities;
 import android.content.Intent;
 import android.graphics.Color;
 import android.os.Bundle;
+import android.widget.ImageView;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup; // Import this
@@ -19,7 +20,8 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 public class DriverDashboard extends AppCompatActivity implements TrackRideListener {
 
     private SwitchMaterial switchStatus;
-    private TextView tvStatusLabel;
+    private TextView tvStatusLabel, tvDriver;
+    private ImageView ivDriverProfile;
 
     // 1. New variables for the containers
     private ViewGroup layoutHeader;
@@ -37,7 +39,20 @@ public class DriverDashboard extends AppCompatActivity implements TrackRideListe
 
         switchStatus = findViewById(R.id.switchStatus);
         tvStatusLabel = findViewById(R.id.tvStatusLabel);
-        btnEarnings = findViewById(R.id.btnEarnings);
+        ivDriverProfile = findViewById(R.id.ivDriverProfile);
+        tvDriver = findViewById(R.id.tvDriver);
+
+        String realName = getSharedPreferences("DriverPrefs", MODE_PRIVATE)
+                .getString("fullName", "Driver");
+
+        tvDriver.setText(realName);
+
+        ivDriverProfile.setOnClickListener(v -> {
+            Intent intent = new Intent(DriverDashboard.this, DriverProfileActivity.class);
+            startActivity(intent);
+        });
+
+
 
         // 3. Setup Listener to Hide/Show Containers
         getSupportFragmentManager().addOnBackStackChangedListener(() -> {

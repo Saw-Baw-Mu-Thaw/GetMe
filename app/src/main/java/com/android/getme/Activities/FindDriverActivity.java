@@ -1,6 +1,11 @@
 package com.android.getme.Activities;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -13,12 +18,15 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Models.CreateRideResult;
 import com.android.getme.R;
 import com.android.getme.ViewModels.FindDriverViewModel;
 import com.android.volley.AuthFailureError;
+import com.android.volley.BuildConfig;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -48,13 +56,22 @@ public class FindDriverActivity extends AppCompatActivity{
     private RequestQueue queue;
     private OkHttpClient client;
     private WebSocket webSocket;
-    private final String BASEURL = "http://10.0.2.2:8000";
-    private final String WSURL = "ws://10.0.2.2:8000/ws";
+    private String BASEURL;
+    private String WSURL;
+
+    private NotificationManager manager;
+    final private int notificationId = 101;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_find_driver);
+
+        manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        BASEURL = ActivityCompat.getString(this, R.string.base_url);
+        WSURL = ActivityCompat.getString(this, R.string.ws_url);
+
+        createNotificationChannel();
 
         populateViewModel();
 
@@ -64,13 +81,6 @@ public class FindDriverActivity extends AppCompatActivity{
 
         findDriverPickupTextView.setText(viewModel.pickupName);
         findDriverDropoffTextView.setText(viewModel.dropoffName);
-        findDriverCancelBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                // TODO: cancel volley request
-                finish();
-            }
-        });
 
         findDriverCancelBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -79,12 +89,25 @@ public class FindDriverActivity extends AppCompatActivity{
             }
         });
 
-//        fakeRequest();
-
         makeRequest();
     }
 
+    private void createNotificationChannel() {
+        String id = getPackageName();
+        String name = ActivityCompat.getString(this, R.string.channel_name);
+        String description = ActivityCompat.getString(this, R.string.channel_desc);
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+        NotificationChannel channel =
+                new NotificationChannel(id, name, importance);
+
+        channel.setDescription(description);
+        channel.enableVibration(true);
+        manager.createNotificationChannel(channel);
+    }
+
     private void cancelRide() {
+
+        sendCancelNotification();
 
         queue.cancelAll(requestTAG);
 
@@ -94,7 +117,9 @@ public class FindDriverActivity extends AppCompatActivity{
         try {
             jsonObject.put("rideId", viewModel.rideId);
         }catch(Exception e) {
-            e.printStackTrace();
+            WarningDialogFragment.newInstance("JSON Encode Warning",
+                    "Could not encode rideId")
+                    .show(getSupportFragmentManager(), "Cancel Warning dialog");
         }
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
@@ -115,6 +140,20 @@ public class FindDriverActivity extends AppCompatActivity{
 
         queue.add(request);
 
+    }
+
+    private void sendCancelNotification() {
+        String channelId = getPackageName();
+
+        Notification notification =
+                new Notification.Builder(this, channelId)
+                        .setContentTitle("Ride Cancelled")
+                        .setContentText("Your Ride has been cancelled.")
+                        .setSmallIcon(R.drawable.ic_getme_logo)
+                        .setChannelId(channelId)
+                        .build();
+
+        manager.notify(notificationId, notification);
     }
 
     private void makeRequest() {
@@ -138,10 +177,12 @@ public class FindDriverActivity extends AppCompatActivity{
             jsonObject.put("dropoffLat", String.format("%.3f",viewModel.dropoffLocation.getLatitude()));
             jsonObject.put("dropoffLong", String.format("%.3f", viewModel.dropoffLocation.getLongitude()));
             jsonObject.put("distance", String.format("%.1f", viewModel.distance));
-            jsonObject.put("duration", viewModel.duration);
+            jsonObject.put("duration", viewModel.duration/60);
             jsonObject.put("status", "Finding Driver");
         }catch (Exception e) {
-            e.printStackTrace();
+            WarningDialogFragment.newInstance("JSON Encode Error",
+                    "Could not encode ride create body")
+                    .show(getSupportFragmentManager(), "Encode Warning Dialog");
         }
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
@@ -153,7 +194,9 @@ public class FindDriverActivity extends AppCompatActivity{
 
                             openWebSocket();
                         }catch(Exception e) {
-                            e.printStackTrace();
+                            WarningDialogFragment.newInstance("JSON Decode Error",
+                                    "Could not decode rideId from json body")
+                                    .show(getSupportFragmentManager(), "Decode Warning Dialog");
                         }
 
                     }
@@ -162,6 +205,8 @@ public class FindDriverActivity extends AppCompatActivity{
             public void onErrorResponse(VolleyError volleyError) {
                 Log.e("Find Driver", "Ride request encountered an error.");
                 volleyError.printStackTrace();
+                WarningDialogFragment.newInstance("Network Error", "Could not connect to server")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
             }
         });
 
@@ -181,6 +226,7 @@ public class FindDriverActivity extends AppCompatActivity{
     }
 
     private void returnData() {
+        sendNotification();
         Intent intent = new Intent();
         intent.putExtra("rideId", viewModel.rideId);
         intent.putExtra("driverId", viewModel.driverId);
@@ -189,46 +235,18 @@ public class FindDriverActivity extends AppCompatActivity{
         finish();
     }
 
-    private void fakeRequest() {
-        Handler handler = new Handler(Looper.getMainLooper()) {
-            @Override
-            public void handleMessage(@NonNull Message msg) {
-                Bundle b = msg.getData();
-                if(b != null) {
-                    viewModel.driverId = b.getInt("driverId");
-                    viewModel.rideId = b.getInt("rideId");
-                    returnData();
-                }
-                super.handleMessage(msg);
-            }
-        };
-        ExecutorService executorService = Executors.newSingleThreadExecutor();
-        executorService.submit(new Runnable() {
-            @Override
-            public void run() {
-                // simulate sending the request for a ride
-                try{
-                    Thread.sleep(3000);
-                }catch(Exception e) {
-                    e.printStackTrace();
-                }
+    private void sendNotification() {
+        String channelId = getPackageName();
 
+        Notification notification =
+                new Notification.Builder(this, channelId)
+                        .setContentTitle("Ride Accepted")
+                        .setContentText("Your Driver is on the way")
+                        .setSmallIcon(R.drawable.ic_getme_logo)
+                        .setChannelId(channelId)
+                        .build();
 
-                // simuate driver accepting the request
-                try{
-                    Thread.sleep(3000);
-                }catch(Exception e) {
-                    e.printStackTrace();
-                }
-               Message msg = handler.obtainMessage();
-                Bundle b = new Bundle();
-                b.putInt("rideId", 1);
-                b.putInt("driverId", 1);
-                msg.setData(b);
-                handler.sendMessage(msg);
-            }
-        });
-        executorService.shutdown();
+        manager.notify(notificationId, notification);
     }
 
     private void populateViewModel() {
