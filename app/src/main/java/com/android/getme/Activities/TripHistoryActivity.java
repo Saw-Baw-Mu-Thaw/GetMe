@@ -1,6 +1,7 @@
 package com.android.getme.Activities;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -35,17 +36,17 @@ public class TripHistoryActivity extends AppCompatActivity {
     private List<Object> items;
 
     // TODO: Change '2' to the actual logged-in driver's ID dynamically
-    private static final int DRIVER_ID = 2;
+    private int driverId;
+    private static final String BASE_URL = "http://10.0.2.2:8000";
 
-    // NOTE: '10.0.2.2' is the localhost alias for Android Emulator.
-    // Use your computer's actual IP (e.g., 192.168.1.x) if testing on a real phone.
-    // Based on your swagger, the endpoint uses a query parameter.
-    // 10.0.2.2 points to your computer's "localhost"
-    private static final String API_URL = "http://10.0.2.2:8000/trip/history?driverId=" + DRIVER_ID;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_trip_history);
+
+        SharedPreferences sp = getSharedPreferences("SESSION", MODE_PRIVATE);
+        driverId = sp.getInt("userId", -1);
+
 
         // 1. Setup UI
         ImageView btnBack = findViewById(R.id.btnBack);
@@ -63,6 +64,7 @@ public class TripHistoryActivity extends AppCompatActivity {
     }
 
     private void fetchRideHistory() {
+        String API_URL = BASE_URL + "/trip/history?driverId=" + driverId;
         Log.d("TripHistory", "Fetching URL: " + API_URL);
 
         JsonArrayRequest jsonArrayRequest = new JsonArrayRequest(

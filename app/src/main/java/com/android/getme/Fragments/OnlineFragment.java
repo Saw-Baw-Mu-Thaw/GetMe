@@ -1,5 +1,7 @@
 package com.android.getme.Fragments;
 
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -36,12 +38,16 @@ public class OnlineFragment extends Fragment {
 
     // Use 10.0.2.2 for Android Emulator
     private static final String BASE_URL = "http://10.0.2.2:8000";
-    private static final int DRIVER_ID = 2;
+    private int driverId;
 
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_driver_online, container, false);
+
+        SharedPreferences sp = requireActivity().getSharedPreferences("SESSION", Context.MODE_PRIVATE);
+        driverId = sp.getInt("userId", -1);
+
 
         recyclerView = view.findViewById(R.id.rvRideRequests);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
@@ -111,7 +117,7 @@ public class OnlineFragment extends Fragment {
     }
 
     private void acceptRide(RideRequestViewModel ride) {
-        String url = BASE_URL + "/ride/accept/" + ride.getRideId() + "?driverId=" + DRIVER_ID;
+        String url = BASE_URL + "/ride/accept/" + ride.getRideId() + "?driverId=" + driverId;
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.PUT, url, null,
                 response -> {

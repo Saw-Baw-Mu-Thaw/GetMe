@@ -41,7 +41,6 @@ public class DriverProfileActivity extends AppCompatActivity {
     private TextView tvFullName;
     private TextView tvEmail;
     private TextView tvPhone;
-    private TextView tvMembershipStatus;
     private TextView tvProfileVehicleModel;
     private TextView tvProfileLicensePlate;
     private TextView tvProfileVehicleColor;
@@ -49,7 +48,6 @@ public class DriverProfileActivity extends AppCompatActivity {
     private TextView tvTotalRides;
     private TextView tvAcceptanceRate;
     private Spinner spinnerGender;
-    private ImageView ivSettings;
     private ShapeableImageView ivPicture;
     private MaterialButton btnLogout;
 
@@ -69,7 +67,6 @@ public class DriverProfileActivity extends AppCompatActivity {
 
         // Setup components
         setupGenderSpinner();
-        setupClickListeners();
         loadDriverProfile();
     }
 
@@ -85,7 +82,6 @@ public class DriverProfileActivity extends AppCompatActivity {
         tvFullName = findViewById(R.id.tvFullName);
         tvEmail = findViewById(R.id.tvEmail);
         tvPhone = findViewById(R.id.tvPhone);
-        tvMembershipStatus = findViewById(R.id.tvMembershipStatus);
         tvProfileVehicleModel = findViewById(R.id.tvProfileVehicleModel);
         tvProfileLicensePlate = findViewById(R.id.tvProfileLicensePlate);
         tvProfileVehicleColor = findViewById(R.id.tvProfileVehicleColor);
@@ -93,7 +89,6 @@ public class DriverProfileActivity extends AppCompatActivity {
         tvTotalRides = findViewById(R.id.tvTotalRides);
         tvAcceptanceRate = findViewById(R.id.tvAcceptanceRate);
         spinnerGender = findViewById(R.id.spinnerGender);
-        ivSettings = findViewById(R.id.ivSettings);
         ivPicture = findViewById(R.id.ivPicture);
         btnLogout = findViewById(R.id.btnLogout);
     }
@@ -109,32 +104,12 @@ public class DriverProfileActivity extends AppCompatActivity {
         spinnerGender.setAdapter(adapter);
     }
 
-    private void setupClickListeners() {
-        // Settings button click
-        ivSettings.setOnClickListener(v -> {
-            Toast.makeText(DriverProfileActivity.this, "Settings clicked", Toast.LENGTH_SHORT).show();
-            // Navigate to settings activity
-            // Intent intent = new Intent(DriverProfileActivity.this, SettingsActivity.class);
-            // startActivity(intent);
-        });
-
-        // Logout button click
-        btnLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
-
-        // Profile picture click (for changing photo)
-        ivPicture.setOnClickListener(v -> {
-            Toast.makeText(DriverProfileActivity.this, "Change profile picture", Toast.LENGTH_SHORT).show();
-            // Implement image picker
-            // openImagePicker();
-        });
-    }
-
     private void loadDriverProfile() {
         // Load real user data from SharedPreferences (saved during login/registration)
         String fullName = sharedPreferences.getString(KEY_FULL_NAME, "");
         String email = sharedPreferences.getString(KEY_EMAIL, "");
         String phone = sharedPreferences.getString(KEY_PHONE, "");
-        String gender = sharedPreferences.getString(KEY_GENDER, "Male");
+        String gender = sharedPreferences.getString(KEY_GENDER, "");
         String vehicleModel = sharedPreferences.getString(KEY_VEHICLE_MODEL, "Not set");
         String licensePlate = sharedPreferences.getString(KEY_LICENSE_PLATE, "Not set");
         String vehicleColor = sharedPreferences.getString(KEY_VEHICLE_COLOR, "Not set");
@@ -154,20 +129,12 @@ public class DriverProfileActivity extends AppCompatActivity {
             phone = "No phone";
         }
 
-        // Set name in header
+        // Set personal info
         tvUserName.setText(fullName);
-
-        // Set name in personal info
         tvFullName.setText(fullName);
-
-        // Set email
         tvEmail.setText(email);
-
-        // Set phone
         tvPhone.setText(phone);
 
-        // Set membership status
-        tvMembershipStatus.setText(isPremium ? "Premium Member" : "Standard Member");
 
         // Set vehicle information
         tvProfileVehicleModel.setText(vehicleModel);
@@ -176,7 +143,7 @@ public class DriverProfileActivity extends AppCompatActivity {
         tvProfileVehicleType.setText(vehicleType);
 
         // Set statistics
-        tvTotalRides.setText(String.valueOf(totalRides));
+        tvTotalRides.setText(String.valueOf(20));
         tvAcceptanceRate.setText(acceptanceRate + "%");
 
         // Set gender spinner selection
@@ -211,12 +178,10 @@ public class DriverProfileActivity extends AppCompatActivity {
     }
 
     private void performLogout() {
-        // Clear driver data from DriverPrefs
         SharedPreferences.Editor driverEditor = sharedPreferences.edit();
         driverEditor.clear();
         driverEditor.apply();
 
-        // Clear session from SESSION SharedPreferences (used by MainActivity)
         SharedPreferences sessionPrefs = getSharedPreferences("SESSION", Context.MODE_PRIVATE);
         SharedPreferences.Editor sessionEditor = sessionPrefs.edit();
         sessionEditor.clear();
@@ -224,12 +189,9 @@ public class DriverProfileActivity extends AppCompatActivity {
 
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
 
-        // Navigate to MainActivity (login screen)
         Intent intent = new Intent(DriverProfileActivity.this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
         startActivity(intent);
-
-        // Finish all activities
         finishAffinity();
     }
 
