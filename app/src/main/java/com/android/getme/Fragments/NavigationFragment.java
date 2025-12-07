@@ -13,7 +13,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 
-import com.android.getme.Activities.VolleySingleton;
+import com.android.getme.Others.VolleySingleton;
 import com.android.getme.R;
 import com.android.volley.Request;
 import com.android.volley.toolbox.JsonObjectRequest;

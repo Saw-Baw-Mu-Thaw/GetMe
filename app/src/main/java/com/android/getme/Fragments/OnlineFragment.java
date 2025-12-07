@@ -15,7 +15,7 @@ import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.android.getme.Activities.VolleySingleton;
+import com.android.getme.Others.VolleySingleton;
 import com.android.getme.Adapters.RideRequestAdapter;
 import com.android.getme.R;
 import com.android.getme.ViewModels.RideRequestViewModel;
@@ -105,7 +105,7 @@ public class OnlineFragment extends Fragment {
 
                 requests.add(new RideRequestViewModel(
                         rideId, "Customer #" + custId, "★ 5.0",
-                        "$" + amount, distance + " km",
+                         amount + " VND" , distance + " km",
                         pickup, dropoff,
                         pickupLat, pickupLng, dropoffLat, dropoffLng // Pass coords
                 ));

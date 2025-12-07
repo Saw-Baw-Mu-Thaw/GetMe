@@ -1,4 +1,4 @@
-package com.android.getme.Activities;
+package com.android.getme.Others;
 
 import android.content.Context;
 import com.android.volley.Request;
