@@ -20,7 +20,7 @@ import com.google.android.material.switchmaterial.SwitchMaterial;
 public class DriverDashboard extends AppCompatActivity implements TrackRideListener {
 
     private SwitchMaterial switchStatus;
-    private TextView tvStatusLabel;
+    private TextView tvStatusLabel, tvDriver;
     private ImageView ivDriverProfile;
 
     // 1. New variables for the containers
@@ -40,6 +40,12 @@ public class DriverDashboard extends AppCompatActivity implements TrackRideListe
         switchStatus = findViewById(R.id.switchStatus);
         tvStatusLabel = findViewById(R.id.tvStatusLabel);
         ivDriverProfile = findViewById(R.id.ivDriverProfile);
+        tvDriver = findViewById(R.id.tvDriver);
+
+        String realName = getSharedPreferences("DriverPrefs", MODE_PRIVATE)
+                .getString("fullName", "Driver");
+
+        tvDriver.setText(realName);
 
         ivDriverProfile.setOnClickListener(v -> {
             Intent intent = new Intent(DriverDashboard.this, DriverProfileActivity.class);
