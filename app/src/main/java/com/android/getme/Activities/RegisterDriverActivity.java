@@ -4,13 +4,10 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
 import android.widget.CheckBox;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
-import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -34,11 +31,9 @@ public class RegisterDriverActivity extends AppCompatActivity {
     private MaterialButton btnDriverCreateRegister;
     private ImageView ivCar, ivBike;
     private TextView tvCar, tvBike, tvDriverSignin;
-    private Spinner spinnerGender;
 
     private LinearLayout linearlayoutBike, linearlayoutCar;
     private String selectedVehicleType = "Car"; // Default
-    private String selectedGender = "male"; // Default
 
     private static final String BASE_URL = "http://10.0.2.2:8000";
 
@@ -48,9 +43,9 @@ public class RegisterDriverActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register_driver);
 
         initViews();
-        setupGenderSpinner();
         setupVehicleSelection();
         selectVehicle(selectedVehicleType);
+
         btnDriverCreateRegister.setOnClickListener(v -> attemptRegister());
 
         tvDriverSignin.setOnClickListener(v -> {
@@ -83,31 +78,6 @@ public class RegisterDriverActivity extends AppCompatActivity {
 
         linearlayoutBike = findViewById(R.id.linearlayoutBike);
         linearlayoutCar = findViewById(R.id.linearlayoutCar);
-
-        spinnerGender = findViewById(R.id.spinnerGender);
-    }
-
-    private void setupGenderSpinner() {
-        String[] genders = {"Male", "Female", "Other"};
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(this,
-                android.R.layout.simple_spinner_item, genders);
-        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-        spinnerGender.setAdapter(adapter);
-
-        // Set default selection
-        spinnerGender.setSelection(0); // Male is default
-
-        spinnerGender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                selectedGender = parent.getItemAtPosition(position).toString().toLowerCase();
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-                selectedGender = "male";
-            }
-        });
     }
 
     private void setupVehicleSelection() {
@@ -193,18 +163,16 @@ public class RegisterDriverActivity extends AppCompatActivity {
             json.put("make", make);
             json.put("license", license);
             json.put("color", color);
-            json.put("gender", selectedGender);
             json.put("earning", 0);
+            // "gender" field removed completely
         } catch (JSONException e) {
             e.printStackTrace();
         }
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, json,
                 response -> {
-                    // SUCCESS
                     Toast.makeText(this, "Registration successful! Please log in.", Toast.LENGTH_LONG).show();
 
-                    // Save profile data (including gender) for later use
                     getSharedPreferences("DriverPrefs", MODE_PRIVATE)
                             .edit()
                             .putString("fullName", fullname)
@@ -214,15 +182,12 @@ public class RegisterDriverActivity extends AppCompatActivity {
                             .putString("licensePlate", license)
                             .putString("vehicleColor", color)
                             .putString("vehicleType", selectedVehicleType)
-                            .putString("gender", selectedGender)
                             .apply();
 
-                    // GO TO LOGIN SCREEN
                     Intent intent = new Intent(RegisterDriverActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
-
                 },
                 error -> {
                     String msg = "Registration failed. Try again.";
@@ -237,38 +202,6 @@ public class RegisterDriverActivity extends AppCompatActivity {
                 });
 
         Volley.newRequestQueue(this).add(request);
-    }
-
-    private void saveDriverSessionAndProfile(int driverId, String fullname, String email,
-                                             String phone, String vehicleModel,
-                                             String licensePlate, String vehicleColor) {
-        // Save to SESSION (for login state)
-        getSharedPreferences("SESSION", MODE_PRIVATE)
-                .edit()
-                .putBoolean("loggedIn", true)
-                .putBoolean("isUser", false)
-                .putInt("userId", driverId)
-                .putString("userName", fullname)
-                .putString("userEmail", email)
-                .putString("userPhone", phone)
-                .apply();
-
-        // Save to DriverPrefs (for profile screen)
-        getSharedPreferences("DriverPrefs", MODE_PRIVATE)
-                .edit()
-                .putString("fullName", fullname)
-                .putString("email", email)
-                .putString("phone", phone)
-                .putString("gender", selectedGender) // Use the selected gender
-                .putString("vehicleModel", vehicleModel)
-                .putString("licensePlate", licensePlate)
-                .putString("vehicleColor", vehicleColor)
-                .putString("vehicleType", selectedVehicleType)
-                .putInt("totalRides", 0)
-                .putInt("acceptanceRate", 100)
-                .putBoolean("isPremium", false)
-                .putBoolean("isLoggedIn", true)
-                .apply();
     }
 
     private void resetErrors() {
