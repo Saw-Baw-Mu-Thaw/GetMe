@@ -189,28 +189,47 @@ public class MainActivity extends AppCompatActivity {
     // Save customer profile to UserPrefs
     private void saveCustomerProfile(JSONObject response) throws JSONException {
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
+
+        String existingGender = prefs.getString("gender", "male");
+
         SharedPreferences.Editor editor = prefs.edit();
 
         editor.putString("fullName", response.getString("fullname"));
         editor.putString("email", response.getString("email"));
         editor.putString("phone", response.getString("phone"));
-        editor.putString("gender", response.optString("gender", " "));
+
+        // Use backend gender if available, otherwise keep existing
+        String genderFromBackend = response.optString("gender", "");
+        if (genderFromBackend.isEmpty() || genderFromBackend.trim().isEmpty()) {
+            editor.putString("gender", existingGender);
+        } else {
+            editor.putString("gender", genderFromBackend);
+        }
+
         editor.putBoolean("isPremium", response.optBoolean("isPremium", false));
 
         editor.apply();
         Log.d("LOGIN_PROFILE", "Customer profile saved to UserPrefs");
     }
 
-    // Save driver profile to DriverPrefs (for DriverProfileActivity)
     private void saveDriverProfile(JSONObject response) throws JSONException {
         SharedPreferences prefs = getSharedPreferences("DriverPrefs", MODE_PRIVATE);
+
+        String existingGender = prefs.getString("gender", "male");
+
         SharedPreferences.Editor editor = prefs.edit();
 
         // Personal Information
         editor.putString("fullName", response.getString("fullname"));
         editor.putString("email", response.getString("email"));
         editor.putString("phone", response.getString("phone"));
-        editor.putString("gender", response.optString("gender", " "));
+
+        String genderFromBackend = response.optString("gender", "");
+        if (genderFromBackend.isEmpty() || genderFromBackend.trim().isEmpty()) {
+            editor.putString("gender", existingGender);
+        } else {
+            editor.putString("gender", genderFromBackend);
+        }
 
         // Vehicle Information
         editor.putString("vehicleModel", response.optString("make", "Not set"));

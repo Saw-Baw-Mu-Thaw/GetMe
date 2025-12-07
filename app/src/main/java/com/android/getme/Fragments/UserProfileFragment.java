@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -37,6 +38,8 @@ public class UserProfileFragment extends Fragment {
     private Spinner spinnerGender;
     private ShapeableImageView ivProfilePicture;
     private MaterialButton btnProfileLogout;
+
+    private boolean isLoadingProfile = false; // Prevent saving during initial load
 
     public static UserProfileFragment newInstance() {
         return new UserProfileFragment();
@@ -85,6 +88,23 @@ public class UserProfileFragment extends Fragment {
                 android.R.layout.simple_spinner_item, genderOptions);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapter);
+
+        // Save gender when user changes it
+        spinnerGender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                // Don't save during initial load
+                if (!isLoadingProfile) {
+                    String selectedGender = parent.getItemAtPosition(position).toString().toLowerCase();
+                    saveGender(selectedGender);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
     }
 
     private void setupClickListeners() {
@@ -96,6 +116,8 @@ public class UserProfileFragment extends Fragment {
 
 
     private void loadUserProfile() {
+        isLoadingProfile = true; // Prevent spinner from saving during load
+
         String fullName = sharedPreferences.getString("fullName", "User");
         String email = sharedPreferences.getString("email", "No email");
         String phone = sharedPreferences.getString("phone", "Not set");
@@ -107,15 +129,36 @@ public class UserProfileFragment extends Fragment {
         tvProfileEmail.setText(email);
         tvProfilePhone.setText(phone);
 
-        // Gender
-        String gender = sharedPreferences.getString("gender", " ");
-        int position = 0;
-        switch (gender.toLowerCase()) {
-            case "female": position = 1; break;
-            case "other": position = 2; break;
-            case "prefer not to say": position = 3; break;
+        // Gender - load saved value
+        String gender = sharedPreferences.getString("gender", "male");
+        Log.d("PROFILE_DEBUG", "Loading gender: '" + gender + "'");
+
+        int position = 0; // Default to Male
+        switch (gender.trim().toLowerCase()) {
+            case "female":
+                position = 1;
+                break;
+            case "other":
+                position = 2;
+                break;
+            case "prefer not to say":
+                position = 3;
+                break;
+            case "male":
+            default:
+                position = 0;
+                break;
         }
         spinnerGender.setSelection(position);
+
+        isLoadingProfile = false;
+    }
+
+    private void saveGender(String gender) {
+        sharedPreferences.edit()
+                .putString("gender", gender)
+                .apply();
+        Log.d("PROFILE_DEBUG", "Gender saved: " + gender);
     }
 
     private void showLogoutConfirmationDialog() {
@@ -128,13 +171,8 @@ public class UserProfileFragment extends Fragment {
     }
 
     private void performLogout() {
-        // Clear both SESSION and UserPrefs
         requireContext().getSharedPreferences("SESSION", Context.MODE_PRIVATE)
                 .edit().clear().apply();
-
-        requireContext().getSharedPreferences("UserPrefs", Context.MODE_PRIVATE)
-                .edit().clear().apply();
-
         Toast.makeText(requireContext(), "Logged out successfully", Toast.LENGTH_SHORT).show();
 
         Intent intent = new Intent(requireContext(), MainActivity.class);

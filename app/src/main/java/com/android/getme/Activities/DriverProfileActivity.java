@@ -4,7 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.Spinner;
@@ -48,25 +50,23 @@ public class DriverProfileActivity extends AppCompatActivity {
     private TextView tvTotalRides;
     private TextView tvAcceptanceRate;
     private Spinner spinnerGender;
-    private ShapeableImageView ivPicture;
     private MaterialButton btnLogout;
+
+    private boolean isLoadingProfile = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_driver_profile);
 
-        // Initialize SharedPreferences
         sharedPreferences = getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE);
 
-        // Setup toolbar with back button
         setupToolbar();
-
-        // Initialize views
         initViews();
 
         // Setup components
         setupGenderSpinner();
+        setupLogoutButton();
         loadDriverProfile();
     }
 
@@ -89,8 +89,11 @@ public class DriverProfileActivity extends AppCompatActivity {
         tvTotalRides = findViewById(R.id.tvTotalRides);
         tvAcceptanceRate = findViewById(R.id.tvAcceptanceRate);
         spinnerGender = findViewById(R.id.spinnerGender);
-        ivPicture = findViewById(R.id.ivPicture);
         btnLogout = findViewById(R.id.btnLogout);
+    }
+
+    private void setupLogoutButton() {
+        btnLogout.setOnClickListener(v -> showLogoutConfirmationDialog());
     }
 
     private void setupGenderSpinner() {
@@ -102,14 +105,30 @@ public class DriverProfileActivity extends AppCompatActivity {
         );
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapter);
+
+        spinnerGender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                if (!isLoadingProfile) {
+                    String selectedGender = parent.getItemAtPosition(position).toString().toLowerCase();
+                    saveGender(selectedGender);
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+                // Do nothing
+            }
+        });
     }
 
     private void loadDriverProfile() {
-        // Load real user data from SharedPreferences (saved during login/registration)
+        isLoadingProfile = true;
+
         String fullName = sharedPreferences.getString(KEY_FULL_NAME, "");
         String email = sharedPreferences.getString(KEY_EMAIL, "");
         String phone = sharedPreferences.getString(KEY_PHONE, "");
-        String gender = sharedPreferences.getString(KEY_GENDER, "");
+        String gender = sharedPreferences.getString(KEY_GENDER, "male");
         String vehicleModel = sharedPreferences.getString(KEY_VEHICLE_MODEL, "Not set");
         String licensePlate = sharedPreferences.getString(KEY_LICENSE_PLATE, "Not set");
         String vehicleColor = sharedPreferences.getString(KEY_VEHICLE_COLOR, "Not set");
@@ -118,7 +137,8 @@ public class DriverProfileActivity extends AppCompatActivity {
         int acceptanceRate = sharedPreferences.getInt(KEY_ACCEPTANCE_RATE, 100);
         boolean isPremium = sharedPreferences.getBoolean(KEY_IS_PREMIUM, false);
 
-        // Check if user data exists
+        Log.d("DRIVER_PROFILE", "Loading gender: '" + gender + "'");
+
         if (fullName.isEmpty()) {
             fullName = "Driver Name";
         }
@@ -135,34 +155,41 @@ public class DriverProfileActivity extends AppCompatActivity {
         tvEmail.setText(email);
         tvPhone.setText(phone);
 
-
         // Set vehicle information
         tvProfileVehicleModel.setText(vehicleModel);
         tvProfileLicensePlate.setText(licensePlate);
         tvProfileVehicleColor.setText(vehicleColor);
         tvProfileVehicleType.setText(vehicleType);
 
-        // Set statistics
         tvTotalRides.setText(String.valueOf(20));
         tvAcceptanceRate.setText(acceptanceRate + "%");
 
-        // Set gender spinner selection
-        int genderPosition;
-        switch (gender.toLowerCase()) {
-            case "male":
-                genderPosition = 0;
-                break;
+        int genderPosition = 0; // Default to Male
+        switch (gender.trim().toLowerCase()) {
             case "female":
                 genderPosition = 1;
                 break;
             case "other":
                 genderPosition = 2;
                 break;
-            default:
+            case "prefer not to say":
                 genderPosition = 3;
+                break;
+            case "male":
+            default:
+                genderPosition = 0;
                 break;
         }
         spinnerGender.setSelection(genderPosition);
+
+        isLoadingProfile = false;
+    }
+
+    private void saveGender(String gender) {
+        sharedPreferences.edit()
+                .putString(KEY_GENDER, gender)
+                .apply();
+        Log.d("DRIVER_PROFILE", "Gender saved: " + gender);
     }
 
     private void showLogoutConfirmationDialog() {
@@ -178,14 +205,8 @@ public class DriverProfileActivity extends AppCompatActivity {
     }
 
     private void performLogout() {
-        SharedPreferences.Editor driverEditor = sharedPreferences.edit();
-        driverEditor.clear();
-        driverEditor.apply();
-
         SharedPreferences sessionPrefs = getSharedPreferences("SESSION", Context.MODE_PRIVATE);
-        SharedPreferences.Editor sessionEditor = sessionPrefs.edit();
-        sessionEditor.clear();
-        sessionEditor.apply();
+        sessionPrefs.edit().clear().apply();
 
         Toast.makeText(this, "Logged out successfully", Toast.LENGTH_SHORT).show();
 
