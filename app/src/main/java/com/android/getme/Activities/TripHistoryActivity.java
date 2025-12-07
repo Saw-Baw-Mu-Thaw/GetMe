@@ -1,6 +1,5 @@
 package com.android.getme.Activities;
 
-import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -15,6 +14,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.getme.Others.VolleySingleton;
 import com.android.getme.R;
 import com.android.volley.Request;
 import com.android.volley.Response;
@@ -22,7 +22,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 
 import org.json.JSONArray;
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -114,7 +113,7 @@ public class TripHistoryActivity extends AppCompatActivity {
                 String date = obj.optString("date", "N/A"); // e.g. "2025-12-05 14:00"
 
                 double amount = obj.optDouble("amount", 0.00);
-                String price = "$" + String.format("%.2f", amount);
+                String price =  String.format("%.2f", amount) + " VND" ;
 
                 // Assuming duration/distance are numbers or strings in JSON
                 String duration = obj.optString("duration", "0") + " min";

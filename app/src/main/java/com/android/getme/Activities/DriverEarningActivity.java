@@ -16,14 +16,12 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import com.android.getme.Others.VolleySingleton;
 import com.android.getme.R;
 import com.android.volley.Request;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonArrayRequest;
 import com.android.volley.toolbox.JsonObjectRequest;
 
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -92,7 +90,7 @@ public class DriverEarningActivity extends AppCompatActivity {
                         int totalTrips = response.getInt("total_trips");
                         int totalEarnings = response.getInt("total_earnings");
 
-                        txtAmount.setText("$" + totalEarnings);
+                        txtAmount.setText(totalEarnings + " VND");
                         if(txtTotalTrips != null) {
                             txtTotalTrips.setText(String.valueOf(totalTrips));
                         }
@@ -132,7 +130,8 @@ public class DriverEarningActivity extends AppCompatActivity {
 
                             // Create View Model
                             String route = from + " → " + to;
-                            String priceStr = "$" + String.format("%.2f", amount);
+                            String priceStr = String.format("%.2f", amount) + " VND" ;
+
                             // Combine Date and Distance for the 'Details' line
                             String details = date + " • " + distance;
 
