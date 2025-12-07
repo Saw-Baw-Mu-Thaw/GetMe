@@ -33,47 +33,40 @@
 
             <LinearLayout
                 android:id="@+id/homeScreenLinlay"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:orientation="vertical"
-                android:paddingHorizontal="17dp"
-                android:paddingVertical="11dp">
+                android:layout_weight="1">
+                        <ImageView
+                            android:layout_width="27dp"
+                            android:layout_height="24dp"
+                            android:layout_marginBottom="12dp"
+                            android:scaleType="fitXY"
+                            android:src="@drawable/home" />
 
-                <ImageView
-                    android:layout_width="27dp"
-                    android:layout_height="24dp"
-                    android:layout_marginBottom="12dp"
-                    android:scaleType="fitXY"
-                    android:src="@drawable/home" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Home"
-                    android:textColor="#9CA3AF"
-                    android:textSize="12sp"
-                    android:textStyle="bold" />
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Home"
+                            android:textColor="#9CA3AF"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
             </LinearLayout>
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="match_parent"
-                android:layout_weight="1"
-                android:orientation="vertical"></LinearLayout>
 
             <LinearLayout
                 android:id="@+id/activityScreenLinlay"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="45dp"
                 android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="24dp"
                     android:layout_height="24dp"
-                    android:layout_marginBottom="11dp"
+                    android:layout_marginBottom="12dp"
                     android:scaleType="fitXY"
                     android:src="@drawable/activity" />
 
@@ -88,11 +81,11 @@
 
             <LinearLayout
                 android:id="@+id/notificationScreenLinlay"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="45dp"
                 android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="21dp"
@@ -112,16 +105,16 @@
 
             <LinearLayout
                 android:id="@+id/profileScreenLinlay"
-                android:layout_width="wrap_content"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginEnd="15dp"
                 android:gravity="center_horizontal"
-                android:orientation="vertical">
+                android:orientation="vertical"
+                android:layout_weight="1">
 
                 <ImageView
                     android:layout_width="21dp"
                     android:layout_height="24dp"
-                    android:layout_marginBottom="11dp"
+                    android:layout_marginBottom="12dp"
                     android:scaleType="fitXY"
                     android:src="@drawable/profile" />
 

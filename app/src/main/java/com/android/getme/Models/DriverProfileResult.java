@@ -10,4 +10,5 @@ public class DriverProfileResult {
     public String license;
     public String color;
     public int earning;
+    public int average_rating;
 }

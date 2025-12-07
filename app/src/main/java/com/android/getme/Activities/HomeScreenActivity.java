@@ -1,6 +1,10 @@
 package com.android.getme.Activities;
 
+import android.Manifest;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.LinearLayout;
@@ -11,7 +15,9 @@ import androidx.activity.result.ActivityResult;
 import androidx.activity.result.ActivityResultCallback;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -20,14 +26,20 @@ import androidx.lifecycle.ViewModelProvider;
 
 import com.android.getme.Fragments.ActivityFragment;
 import com.android.getme.Fragments.HomeScreenFragment;
+import com.android.getme.Fragments.UserProfileFragment;
+import com.android.getme.Fragments.NotificationFragment;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.CustHomeFragListener;
+import com.android.getme.Listeners.OngoingRideListener;
 import com.android.getme.R;
 import com.android.getme.ViewModels.CustRideViewModel;
 
 import org.osmdroid.util.GeoPoint;
 
+import java.util.ArrayList;
+
 public class HomeScreenActivity extends AppCompatActivity implements
-        CustHomeFragListener {
+        CustHomeFragListener, OngoingRideListener {
 
     LinearLayout homeScreenLinLay;
     LinearLayout activityScreenLinLay;
@@ -40,14 +52,18 @@ public class HomeScreenActivity extends AppCompatActivity implements
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult o) {
-                    if(o.getResultCode() == RESULT_OK && o.getData() != null) {
+                    if (o.getResultCode() == RESULT_OK && o.getData() != null) {
 
                         String status = o.getData().getStringExtra("status");
-                        if(status.equals("Cancelled") || status.equals("Completed")) {
+                        if (status.equals("Cancelled") || status.equals("Completed")) {
                             unpopulateViewModel();
                         }
 
                     }
+
+                    getSupportFragmentManager().beginTransaction()
+                            .replace(R.id.homeScreenFragContainer, new HomeScreenFragment())
+                            .commit();
                 }
             }
     );
@@ -72,14 +88,14 @@ public class HomeScreenActivity extends AppCompatActivity implements
             new ActivityResultCallback<ActivityResult>() {
                 @Override
                 public void onActivityResult(ActivityResult result) {
-                    if(result.getResultCode() == RESULT_OK) {
+                    if (result.getResultCode() == RESULT_OK) {
                         Bundle b = result.getData().getExtras();
-                        if(b != null) {
+                        if (b != null) {
 
                             String status = b.getString("status");
-                            if(status.equals("Cancelled")) {
+                            if (status.equals("Cancelled")) {
                                 unpopulateViewModel();
-                            }else{
+                            } else {
                                 populateViewModelWithResult(b);
                                 startTrackRide();
                             }
@@ -142,13 +158,14 @@ public class HomeScreenActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home_screen);
+
         ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (v, insets) -> {
             Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
             v.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
             return insets;
         });
 
-        if(getIntent().getExtras() == null) {
+        if (getIntent().getExtras() == null) {
             return;
         }
         ViewModelProvider viewModelProvider = new ViewModelProvider(this);
@@ -166,6 +183,45 @@ public class HomeScreenActivity extends AppCompatActivity implements
 
         // Sets Home screen as default screen
         getSupportFragmentManager().beginTransaction().replace(R.id.homeScreenFragContainer, new HomeScreenFragment()).commit();
+
+        requestPermissions();
+    }
+
+    private void requestPermissions() {
+        ArrayList<String> permissions = new ArrayList<>();
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+
+        if (ActivityCompat.checkSelfPermission(this,
+                Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED) {
+            permissions.add(Manifest.permission.POST_NOTIFICATIONS);
+
+        }
+
+        if(!permissions.isEmpty()) {
+            String[] permArray = permissions.toArray(new String[0]);
+            ActivityCompat.requestPermissions(this, permArray, 1);
+        }
+
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        int permission_granted = PackageManager.PERMISSION_GRANTED;
+        if (permissions[0].equals(Manifest.permission.ACCESS_FINE_LOCATION) && grantResults[0] != permission_granted) {
+            WarningDialogFragment.newInstance("Location Not Enabled", "Location permission is needed for the app to work").show(
+                    getSupportFragmentManager(), "Location Warning Dialog"
+            );
+        }
+
+        if (permissions.length == 2 && permissions[1].equals(Manifest.permission.POST_NOTIFICATIONS) && grantResults[1] != permission_granted) {
+            WarningDialogFragment.newInstance("Notifications Not Enabled", "You will not get notitications").show(
+                    getSupportFragmentManager(), "Notification Warning Dialog"
+            );
+        }
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
 
     private void initializeListeners() {
@@ -181,35 +237,63 @@ public class HomeScreenActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 getSupportFragmentManager().beginTransaction()
-                        .replace(R.id.homeScreenFragContainer, new ActivityFragment()).commit();
+                        .replace(R.id.homeScreenFragContainer,
+                                ActivityFragment.newInstance(custRideViewModel.custId, custRideViewModel.vehicleType))
+                        .commit();
             }
         });
 
         notificationScreenLinLay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showToast("Notification screen will be shown here");
+
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.homeScreenFragContainer,
+                                new NotificationFragment()).commit();
             }
         });
 
         profileScreenLinlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                showToast("Profile screen will be shown here");
+                getSupportFragmentManager().beginTransaction()
+                        .replace(R.id.homeScreenFragContainer, new UserProfileFragment()).commit();
             }
+
         });
     }
 
-    private void showToast(String msg){
+    private void showToast(String msg) {
         Toast.makeText(this, msg, Toast.LENGTH_SHORT).show();
     }
 
     @Override
     public void onBookRideClicked(String vehicleType) {
-        custRideViewModel.vehicleType = vehicleType;
-        Intent intent = new Intent(this, ChoosePickupActivity.class);
-        intent.putExtra("vehicleType", vehicleType);
-        intent.putExtra("custId", custRideViewModel.custId);
-        startForResult.launch(intent);
+        if(isConnected()) {
+            custRideViewModel.vehicleType = vehicleType;
+            Intent intent = new Intent(this, ChoosePickupActivity.class);
+            intent.putExtra("vehicleType", vehicleType);
+            intent.putExtra("custId", custRideViewModel.custId);
+            startForResult.launch(intent);
+        } else {
+            WarningDialogFragment.newInstance("No Internet", "This app requires internet. " +
+                    "Please check your connection").show(getSupportFragmentManager(), "Internet Warning Dialog");
+        }
+
+    }
+
+    @Override
+    public void ongoingRideClicked(String status) {
+        custRideViewModel.status = status;
+        startTrackRide();
+    }
+
+    private boolean isConnected() {
+        ConnectivityManager manager = (ConnectivityManager) getSystemService(CONNECTIVITY_SERVICE);
+        NetworkInfo networkInfo = manager.getActiveNetworkInfo();
+        if (networkInfo != null && networkInfo.isConnected()) {
+            return true;
+        }
+        return false;
     }
 }

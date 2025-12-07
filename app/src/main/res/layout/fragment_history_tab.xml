@@ -9,7 +9,7 @@
         android:id="@+id/rw835d0nwvf"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/ongoing_scroll_bg">
+        android:background="#FFFFFF">
 
         <androidx.recyclerview.widget.RecyclerView
             android:id="@+id/history_recycler_view"

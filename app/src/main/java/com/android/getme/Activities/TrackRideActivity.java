@@ -1,14 +1,21 @@
 package com.android.getme.Activities;
 
+import android.app.Notification;
+import android.app.NotificationChannel;
+import android.app.NotificationManager;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.os.Message;
 import android.service.voice.VoiceInteractionSession;
+import android.util.Log;
 import android.view.View;
+import android.view.animation.AccelerateInterpolator;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.RatingBar;
 import android.widget.TextView;
 
 import androidx.activity.EdgeToEdge;
@@ -26,6 +33,7 @@ import androidx.core.view.WindowInsetsCompat;
 import androidx.lifecycle.ViewModelProvider;
 
 import com.android.getme.Fragments.AnimatedMapFragment;
+import com.android.getme.Fragments.WarningDialogFragment;
 import com.android.getme.Listeners.TrackRideListener;
 import com.android.getme.Models.DriverProfileResult;
 import com.android.getme.R;
@@ -34,10 +42,12 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
+import org.json.JSONObject;
 import org.osmdroid.util.GeoPoint;
 
 import okhttp3.OkHttpClient;
@@ -49,7 +59,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
     private TextView trackRideArrivalTextView;
 
     private TextView trackRideDriverNameTextView;
-    private TextView trackDriverRatingTextView;
+    private RatingBar trackDriverRatingBar;
     private TextView trackRideMakeTextView;
     private TextView trackDriverColorTextView;
     private TextView trackRideLicenseTextView;
@@ -72,18 +82,22 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
     private String baseFare;
     private double distance;
     private String total;
+    private int averageRating;
 
     private final double driverLat = 10.740897;
     private final double driverLng = 106.695322;
 
     private OkHttpClient client;
     private WebSocket webSocket;
-    final private String BASEURL = "http://10.0.2.2:8000";
-    final private String WSURL = "ws://10.0.2.2:8000/ws";
+    private String BASEURL;
+    private String WSURL;
+    private NotificationManager manager;
+    final private int notificationId = 101;
 
     private Handler ArrivalHandler = new Handler(Looper.getMainLooper()) {
         @Override
         public void handleMessage(@NonNull Message msg) {
+            sendNotification();
             loadAnimatedMap();
         }
     };
@@ -111,6 +125,14 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
 
         mViewModel = new ViewModelProvider(this).get(CustRideViewModel.class);
 
+        manager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+
+        BASEURL = ActivityCompat.getString(this, R.string.base_url);
+        WSURL = ActivityCompat.getString(this, R.string.ws_url);
+
+
+        createChannel();
+
         populateViewModel();
 
         initializeViewComponents();
@@ -127,13 +149,88 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
                 Intent intent = new Intent();
                 intent.putExtra("status", "Cancelled");
                 setResult(RESULT_OK, intent);
-                finish();
+                cancelRide();
             }
         });
 
         loadAnimatedMap();
 
         openWebSocket();
+    }
+
+    private void cancelRide() {
+
+        sendCancelNotification();
+
+        String url = BASEURL + "/ride/cancel";
+
+        RequestQueue queue = Volley.newRequestQueue(this);
+
+        JSONObject jsonObject = new JSONObject();
+        try {
+            jsonObject.put("rideId", mViewModel.rideId);
+        }catch(Exception e) {
+            WarningDialogFragment.newInstance("JSON Encode Warning",
+                            "Could not encode rideId")
+                    .show(getSupportFragmentManager(), "Cancel Warning dialog");
+        }
+
+        JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonObject,
+                new Response.Listener<JSONObject>() {
+                    @Override
+                    public void onResponse(JSONObject jsonObject) {
+                        finish();
+                    }
+                }, new Response.ErrorListener() {
+            @Override
+            public void onErrorResponse(VolleyError volleyError) {
+                Log.e("Find Driver", "Cancel Ride Error." + volleyError.toString());
+                WarningDialogFragment.newInstance("Network Error",
+                        "Ride could not be cancelled")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
+            }
+        });
+
+        queue.add(request);
+
+    }
+
+    private void createChannel() {
+        String id = getPackageName();
+        String name = ActivityCompat.getString(this, R.string.channel_name);
+        String desc = ActivityCompat.getString(this, R.string.channel_desc);
+        int importance = NotificationManager.IMPORTANCE_DEFAULT;
+
+        NotificationChannel channel = new NotificationChannel(id, name, importance);
+        channel.setDescription(desc);
+        channel.enableVibration(true);
+        manager.createNotificationChannel(channel);
+    }
+
+    private void sendNotification() {
+        String channelId = getPackageName();
+        Notification notification = new Notification.Builder(this, channelId)
+                .setContentTitle("Driver has arrived")
+                .setContentText("Driver has arrived and is waiting for you at pickup")
+                .setSmallIcon(R.drawable.ic_getme_logo)
+                .setChannelId(channelId)
+                .build();
+
+        manager.notify(notificationId, notification);
+    }
+
+    private void sendCancelNotification() {
+        String channelId = getPackageName();
+
+        Notification notification =
+                new Notification.Builder(this, channelId)
+                        .setContentTitle("Ride Cancelled")
+                        .setContentText("Your Ride has been cancelled.")
+                        .setSmallIcon(R.drawable.ic_getme_logo)
+                        .setChannelId(channelId)
+                        .build();
+
+        manager.notify(notificationId, notification);
     }
 
     private void loadAnimatedMap() {
@@ -156,15 +253,20 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
     }
 
     private void setPrices() {
+
+        String economyRate = ActivityCompat.getString(this, R.string.economy_rate) + " VND";
+        String standardRate = ActivityCompat.getString(this, R.string.standard_rate) + " VND";
+        String bikeRate = ActivityCompat.getString(this, R.string.bike_rate) + " VND";
+
         switch (mViewModel.vehicleType) {
             case "Standard":
-                trackRideBaseFareTextView.setText("100,000 VND");
+                trackRideBaseFareTextView.setText(standardRate);
                 break;
             case "Economy":
-                trackRideBaseFareTextView.setText("80,000 VND");
+                trackRideBaseFareTextView.setText(economyRate);
                 break;
             case "Bike":
-                trackRideBaseFareTextView.setText("50,000 VND");
+                trackRideBaseFareTextView.setText(bikeRate);
                 break;
         }
 
@@ -200,7 +302,8 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
                 driverMake = result.make;
 
                 trackRideDriverNameTextView.setText(result.fullname);
-                trackDriverRatingTextView.setText("Rating: 4.0 (3 rides)");
+                trackDriverRatingBar.setRating(result.average_rating);
+                averageRating = result.average_rating;
                 trackRideMakeTextView.setText(result.make);
                 trackDriverColorTextView.setText(result.color);
                 trackRideLicenseTextView.setText(result.license);
@@ -222,6 +325,9 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
             @Override
             public void onErrorResponse(VolleyError volleyError) {
                 volleyError.printStackTrace();
+                WarningDialogFragment.newInstance("Network Error",
+                        "Could not fetch driver")
+                        .show(getSupportFragmentManager(), "Network Warning Dialog");
             }
         });
 
@@ -232,7 +338,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
         trackRideRideStatusTextView = findViewById(R.id.trackRideRideStatusTextView);
         trackRideArrivalTextView = findViewById(R.id.trackRideArrivalTextView);
         trackRideDriverNameTextView = findViewById(R.id.trackRideDriverNameTextView);
-        trackDriverRatingTextView = findViewById(R.id.trackDriverRatingTextView);
+        trackDriverRatingBar = findViewById(R.id.trackDriverRatingBar);
         trackRideMakeTextView = findViewById(R.id.trackRideMakeTextView);
         trackDriverColorTextView = findViewById(R.id.trackDriverColorTextView);
         trackRideLicenseTextView = findViewById(R.id.trackRideLicenseTextView);
@@ -335,6 +441,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
                 intent.putExtra("distance", mViewModel.distance);
                 intent.putExtra("total", trackRideTotalCostTextView.getText().toString());
                 intent.putExtra("payment", mViewModel.payment);
+                intent.putExtra("rating", averageRating);
                         // also include rating
                 startForResult.launch(intent);
             }

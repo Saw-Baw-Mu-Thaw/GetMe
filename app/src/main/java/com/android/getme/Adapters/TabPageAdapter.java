@@ -11,9 +11,13 @@ import com.android.getme.Fragments.OngoingTabFragment;
 public class TabPageAdapter extends FragmentStateAdapter {
 
     final int tabCount = 2;
+    private int custId;
+    private String vehicleType;
 
-    public TabPageAdapter(@NonNull FragmentActivity fragmentActivity) {
+    public TabPageAdapter(@NonNull FragmentActivity fragmentActivity, int custId, String vehicleType) {
         super(fragmentActivity);
+        this.custId = custId;
+        this.vehicleType = vehicleType;
     }
 
     @NonNull
@@ -21,7 +25,7 @@ public class TabPageAdapter extends FragmentStateAdapter {
     public Fragment createFragment(int position) {
         if(position == 0) {
             // return OngoingTabFragment
-            return new OngoingTabFragment();
+            return OngoingTabFragment.newInstance(custId, vehicleType);
         }else {
             // return HistoryTabFragment
             return new HistoryTabFragment();
