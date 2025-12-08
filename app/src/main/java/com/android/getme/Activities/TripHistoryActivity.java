@@ -35,7 +35,7 @@ public class TripHistoryActivity extends AppCompatActivity {
     private TripAdapter adapter;
     private List<Object> items;
 
-    // TODO: Change '2' to the actual logged-in driver's ID dynamically
+
     private int driverId;
     private static final String BASE_URL = "http://10.0.2.2:8000";
 
@@ -48,9 +48,9 @@ public class TripHistoryActivity extends AppCompatActivity {
         driverId = sp.getInt("userId", -1);
 
 
-        // 1. Setup UI
+
         ImageView btnBack = findViewById(R.id.btnBack);
-        btnBack.setOnClickListener(v -> finish()); // Closes activity to go back
+        btnBack.setOnClickListener(v -> finish());
 
         recyclerView = findViewById(R.id.recyclerViewTrips);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -59,7 +59,7 @@ public class TripHistoryActivity extends AppCompatActivity {
         adapter = new TripAdapter(items);
         recyclerView.setAdapter(adapter);
 
-        // 2. Fetch Data from API
+
         fetchRideHistory();
     }
 
@@ -87,43 +87,41 @@ public class TripHistoryActivity extends AppCompatActivity {
                 }
         );
 
-        // Use the VolleySingleton you provided
+
         VolleySingleton.getInstance(this).addToRequestQueue(jsonArrayRequest);
     }
 
     private void processResponse(JSONArray response) {
         items.clear();
-        items.add("Ride History"); // Add Header
+        items.add("Ride History");
 
         try {
             if (response.length() == 0) {
                 items.add("No trips found.");
-                // You might want to handle an empty state UI here
+
             }
 
             for (int i = 0; i < response.length(); i++) {
                 JSONObject obj = response.getJSONObject(i);
 
-                // --- DATA MAPPING ---
-                // Mapping DB schema columns to variables
-                // Use 'optString' to prevent crashes if a field is null
+
                 String from = obj.optString("LocationFrom", "Unknown");
                 String to = obj.optString("LocationTo", "Unknown");
 
-                // Combine From/To for the card Title
+
                 String title = from + " to " + to;
 
-                String date = obj.optString("date", "N/A"); // e.g. "2025-12-05 14:00"
+                String date = obj.optString("date", "N/A");
 
                 double amount = obj.optDouble("amount", 0.00);
                 String price =  String.format("%.2f", amount) + " VND" ;
 
-                // Assuming duration/distance are numbers or strings in JSON
+
                 String duration = obj.optString("duration", "0") + " min";
                 String distance = obj.optString("distance", "0") + " km";
                 String status = obj.optString("status", "Completed");
 
-                // Create Trip object
+
                 Trip trip = new Trip(title, date, price, duration, distance, status);
                 items.add(trip);
             }
@@ -135,7 +133,7 @@ public class TripHistoryActivity extends AppCompatActivity {
         }
     }
 
-    // --- MODEL ---
+
     static class Trip {
         String title, date, price, duration, distance, status;
 
@@ -149,7 +147,7 @@ public class TripHistoryActivity extends AppCompatActivity {
         }
     }
 
-    // --- ADAPTER ---
+
     static class TripAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
         private static final int TYPE_HEADER = 0;
         private static final int TYPE_TRIP = 1;
@@ -193,11 +191,11 @@ public class TripHistoryActivity extends AppCompatActivity {
                 h.tvDuration.setText(trip.duration);
                 h.tvDistance.setText(trip.distance);
 
-                // Handle status color if needed
+
                 h.tvStatus.setText(trip.status);
                 if(trip.status.equalsIgnoreCase("Cancelled")){
-                    h.tvStatus.setTextColor(0xFFFF0000); // Red for cancelled
-                    h.tvStatus.setBackgroundResource(R.drawable.bg_status_badge); // Ensure you have a badge drawable or remove this
+                    h.tvStatus.setTextColor(0xFFFF0000);
+                    h.tvStatus.setBackgroundResource(R.drawable.bg_status_badge);
                 }
             }
         }
@@ -215,7 +213,7 @@ public class TripHistoryActivity extends AppCompatActivity {
 
             TripViewHolder(View itemView) {
                 super(itemView);
-                // IDs match your provided item_trip_card.xml
+
                 tvTitle = itemView.findViewById(R.id.tvTripTitle);
                 tvDate = itemView.findViewById(R.id.tvTripDate);
                 tvPrice = itemView.findViewById(R.id.tvPrice);

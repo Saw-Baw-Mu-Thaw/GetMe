@@ -7,7 +7,7 @@
     <string name="GH_key">52fe4602-7929-441a-929c-b336642ee47e</string>
     <string name="channel_name">GetMe Noti Channel</string>
     <string name="channel_desc">Channel to publish GetMe notifications</string>
-    <string name="provider">GH</string>
+    <string name="provider">OSRM</string>
     <string name="base_url">http://10.0.2.2:8000</string>
     <string name="ws_url">ws://10.0.2.2:8000/ws</string>
     <string name="economy_rate">80000</string>

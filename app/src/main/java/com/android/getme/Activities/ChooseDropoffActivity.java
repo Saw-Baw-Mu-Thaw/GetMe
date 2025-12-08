@@ -73,12 +73,12 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if(result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        // TODO: set data for dropoff, driverId, vehicleType, payment and rideId
+
                         Bundle b = result.getData().getExtras();
                         if(b != null) {
                             Intent intent = new Intent();
                             String status = b.getString("status");
-                            // TODO : check if status is cancelled
+
                             intent.putExtra("status", status);
 
                             if(status.equals("Cancelled")) {
@@ -117,12 +117,12 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_dropoff);
 
-        // Needed for OSM to work
+
         userAgent = ActivityCompat.getString(this, R.string.GetMe_OSM_User_Agent);
         Configuration.getInstance().setUserAgentValue(userAgent);
 
 
-        // configuring view model
+
         viewModel = new ViewModelProvider(this).get(DropoffViewModel.class);
         if(getIntent().getExtras() != null) {
             viewModel.vehicleType = getIntent().getExtras().getString("vehicleType");
@@ -155,7 +155,7 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
                     String q = "q=" + dropoffNameTextView.getText();
                     String key = "key=" + ActivityCompat.getString(ChooseDropoffActivity.this, R.string.GH_key);
                     String limit = "limit=" + 3;
-                    String point = "&point=10.8231,106.6297"; // to bias ho chi minh city
+                    String point = "&point=10.8231,106.6297";
                     url = url + q + "&" + key + "&" + limit + point;
 
                     StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -168,7 +168,7 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-                            // do nothing yet
+
                             Log.e("Volley Error", volleyError.toString());
                         }
                     });
@@ -183,7 +183,7 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
             @Override
             public void onClick(View view) {
                 if(viewModel.dropoffLocation == null) {
-                    // TODO : replace with alert dialog
+
                     WarningDialogFragment.newInstance("Destination Error", "Destionation not selected")
                             .show(getSupportFragmentManager(), "Destination Warning Dialog");
                     return;
@@ -231,7 +231,7 @@ public class ChooseDropoffActivity extends AppCompatActivity implements
 
     @Override
     public void finish() {
-        // TODO : Return results
+
         if(viewModel.dropoffLocation == null) {
             setResult(RESULT_OK);
         }

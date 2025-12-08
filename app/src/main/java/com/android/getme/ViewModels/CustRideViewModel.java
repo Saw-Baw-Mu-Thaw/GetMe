@@ -9,7 +9,7 @@ import java.sql.Date;
 
 public class CustRideViewModel extends ViewModel {
 
-    // holds info of current ride
+
 
     public int rideId;
     public int custId;

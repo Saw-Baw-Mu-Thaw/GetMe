@@ -13,14 +13,10 @@ import androidx.appcompat.content.res.AppCompatResources;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.android.getme.Models.CustRideHistoryResult;
-import com.android.getme.Others.DummyData;
 import com.android.getme.R;
-import com.android.getme.ViewModels.CustHistoryViewModel;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.util.List;
 
 public class CustHistoryAdapter extends RecyclerView.Adapter<CustHistoryAdapter.ViewHolder> {

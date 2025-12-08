@@ -19,7 +19,7 @@ import java.util.zip.Inflater;
 
 public class WarningDialogFragment extends DialogFragment {
 
-    // empty constructor
+
     public WarningDialogFragment() {
         super();
     }

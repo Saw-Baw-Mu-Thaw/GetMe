@@ -9,7 +9,7 @@ public class RideRequestViewModel {
     private String pickupLocation;
     private String dropoffLocation;
 
-    // --- New Fields for Coordinates ---
+
     private double pickupLat;
     private double pickupLng;
     private double dropoffLat;
@@ -25,14 +25,14 @@ public class RideRequestViewModel {
         this.distance = distance;
         this.pickupLocation = pickupLocation;
         this.dropoffLocation = dropoffLocation;
-        // Store coordinates
+
         this.pickupLat = pickupLat;
         this.pickupLng = pickupLng;
         this.dropoffLat = dropoffLat;
         this.dropoffLng = dropoffLng;
     }
 
-    // --- Getters ---
+
     public int getRideId() { return rideId; }
     public String getName() { return name; }
     public String getRating() { return rating; }

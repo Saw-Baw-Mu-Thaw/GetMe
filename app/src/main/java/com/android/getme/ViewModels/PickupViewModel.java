@@ -14,7 +14,7 @@ import org.osmdroid.util.GeoPoint;
 public class PickupViewModel extends ViewModel {
 
     public GeoPoint currLocation;
-    // to store it temporarily
+
     public String vehicleType;
     public int custId;
 

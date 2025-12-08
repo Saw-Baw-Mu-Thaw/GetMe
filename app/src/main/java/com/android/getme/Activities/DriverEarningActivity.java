@@ -35,12 +35,11 @@ public class DriverEarningActivity extends AppCompatActivity {
     private TripsAdapter adapter;
     private List<Trip> tripList;
 
-    // UI References
+
     private TextView txtAmount;
     private TextView txtTotalTrips;
 
     private int driverId;
-    // Base URL for Emulator (10.0.2.2)
     private static final String BASE_URL = "http://10.0.2.2:8000";
 
     @Override
@@ -51,15 +50,15 @@ public class DriverEarningActivity extends AppCompatActivity {
         SharedPreferences sp = getSharedPreferences("SESSION", MODE_PRIVATE);
         driverId = sp.getInt("userId", -1);
 
-        // Hide ActionBar
+
         if (getSupportActionBar() != null) {
             getSupportActionBar().hide();
         }
 
-        // --- 1. Initialize UI ---
+
         ImageView btnBack = findViewById(R.id.btnBack);
         txtAmount = findViewById(R.id.txtAmount);
-        txtTotalTrips = findViewById(R.id.txtTotalTrips); // Ensure ID exists in XML
+        txtTotalTrips = findViewById(R.id.txtTotalTrips);
         recyclerView = findViewById(R.id.recyclerViewTrips);
 
         btnBack.setOnClickListener(v -> {
@@ -67,23 +66,20 @@ public class DriverEarningActivity extends AppCompatActivity {
             startActivity(intent);
         });
 
-        // --- 2. Setup RecyclerView ---
+
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
-        recyclerView.setNestedScrollingEnabled(false); // Important for nesting in ScrollView
+        recyclerView.setNestedScrollingEnabled(false);
 
         tripList = new ArrayList<>();
         adapter = new TripsAdapter(tripList);
         recyclerView.setAdapter(adapter);
 
-        // --- 3. Fetch Data ---
-        fetchEarningsData(); // Get Summary (Total $)
-        fetchRecentTrips();  // Get List (Recycler View)
+
+        fetchEarningsData();
+        fetchRecentTrips();
     }
 
-    /**
-     * Fetches summary stats: Total Earnings and Trip Count
-     * Endpoint: /earnings
-     */
+
     private void fetchEarningsData() {
         String url = BASE_URL + "/earnings?driverId=" + driverId;
 
@@ -123,7 +119,7 @@ public class DriverEarningActivity extends AppCompatActivity {
                         for (int i = 0; i < response.length(); i++) {
                             JSONObject obj = response.getJSONObject(i);
 
-                            // Parse Data
+
                             String from = obj.optString("LocationFrom", "Unknown");
                             String to = obj.optString("LocationTo", "Unknown");
                             String date = obj.optString("date", "N/A");
@@ -131,14 +127,14 @@ public class DriverEarningActivity extends AppCompatActivity {
                             String distance = obj.optString("distance", "0") + " km";
                             String status = obj.optString("status", "Completed");
 
-                            // Create View Model
+
                             String route = from + " → " + to;
                             String priceStr = String.format("%.2f", amount) + " VND" ;
 
-                            // Combine Date and Distance for the 'Details' line
+
                             String details = date + " • " + distance;
 
-                            // We use 'status' for the tip field since tip isn't in this specific API
+
                             Trip trip = new Trip(route, details, priceStr, status, status.equalsIgnoreCase("Completed"));
                             tripList.add(trip);
                         }
@@ -157,12 +153,12 @@ public class DriverEarningActivity extends AppCompatActivity {
         VolleySingleton.getInstance(this).addToRequestQueue(jsonArrayRequest);
     }
 
-    // --- Data Model ---
+
     public static class Trip {
         String route;
         String details;
         String price;
-        String statusLabel; // Maps to txtTip in XML
+        String statusLabel;
         boolean isPositiveStatus;
 
         public Trip(String route, String details, String price, String statusLabel, boolean isPositiveStatus) {
@@ -174,7 +170,7 @@ public class DriverEarningActivity extends AppCompatActivity {
         }
     }
 
-    // --- Adapter ---
+
     public static class TripsAdapter extends RecyclerView.Adapter<TripsAdapter.TripViewHolder> {
 
         private List<Trip> trips;
@@ -199,11 +195,11 @@ public class DriverEarningActivity extends AppCompatActivity {
             holder.txtPrice.setText(trip.price);
             holder.txtTip.setText(trip.statusLabel);
 
-            // Color coding status
+
             if (trip.isPositiveStatus) {
-                holder.txtTip.setTextColor(Color.parseColor("#10B981")); // Green
+                holder.txtTip.setTextColor(Color.parseColor("#10B981"));
             } else {
-                holder.txtTip.setTextColor(Color.parseColor("#EF4444")); // Red for Cancelled/Etc
+                holder.txtTip.setTextColor(Color.parseColor("#EF4444"));
             }
         }
 
@@ -221,7 +217,7 @@ public class DriverEarningActivity extends AppCompatActivity {
                 txtRoute = itemView.findViewById(R.id.txtRoute);
                 txtDetails = itemView.findViewById(R.id.txtDetails);
                 txtPrice = itemView.findViewById(R.id.txtPrice);
-                txtTip = itemView.findViewById(R.id.txtTip); // Using this for Status
+                txtTip = itemView.findViewById(R.id.txtTip);
                 imgAvatar = itemView.findViewById(R.id.imgAvatar);
             }
         }

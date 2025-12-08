@@ -38,7 +38,7 @@ public class DriverProfileActivity extends AppCompatActivity {
     private static final String KEY_IS_LOGGED_IN = "isLoggedIn";
     private static final String KEY_IS_PREMIUM = "isPremium";
 
-    // Views
+
     private TextView tvUserName;
     private TextView tvFullName;
     private TextView tvEmail;
@@ -64,7 +64,7 @@ public class DriverProfileActivity extends AppCompatActivity {
         setupToolbar();
         initViews();
 
-        // Setup components
+
         setupGenderSpinner();
         setupLogoutButton();
         loadDriverProfile();
@@ -117,7 +117,7 @@ public class DriverProfileActivity extends AppCompatActivity {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
+
             }
         });
     }
@@ -149,13 +149,13 @@ public class DriverProfileActivity extends AppCompatActivity {
             phone = "No phone";
         }
 
-        // Set personal info
+
         tvUserName.setText(fullName);
         tvFullName.setText(fullName);
         tvEmail.setText(email);
         tvPhone.setText(phone);
 
-        // Set vehicle information
+
         tvProfileVehicleModel.setText(vehicleModel);
         tvProfileLicensePlate.setText(licensePlate);
         tvProfileVehicleColor.setText(vehicleColor);
@@ -164,7 +164,7 @@ public class DriverProfileActivity extends AppCompatActivity {
         tvTotalRides.setText(String.valueOf(20));
         tvAcceptanceRate.setText(acceptanceRate + "%");
 
-        int genderPosition = 0; // Default to Male
+        int genderPosition = 0;
         switch (gender.trim().toLowerCase()) {
             case "female":
                 genderPosition = 1;

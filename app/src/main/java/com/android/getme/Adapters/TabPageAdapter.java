@@ -24,10 +24,10 @@ public class TabPageAdapter extends FragmentStateAdapter {
     @Override
     public Fragment createFragment(int position) {
         if(position == 0) {
-            // return OngoingTabFragment
+
             return OngoingTabFragment.newInstance(custId, vehicleType);
         }else {
-            // return HistoryTabFragment
+
             return new HistoryTabFragment();
         }
     }

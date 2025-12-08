@@ -54,14 +54,10 @@ import java.util.Objects;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-/**
- * A simple {@link Fragment} subclass.
- * Use the {@link AnimatedMapFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+
 public class AnimatedMapFragment extends Fragment {
 
-    // Constants
+
     private  static final float LINE_WIDTH_BIG = 12;
     private static final float TEXT_SIZE = 20;
     private static final int COLOR_POLYLINE_STATIC = Color.BLUE;
@@ -71,12 +67,12 @@ public class AnimatedMapFragment extends Fragment {
     private double mAnimatedMetersSoFar;
     private boolean mAnimationEnded;
 
-    // TODO: Rename parameter arguments, choose names that match
+
     private double startLat;
     private double startLng;
     private double endLat;
     private double endLng;
-    private int duration = 5000; // animation will take 5 seconds to complete
+    private int duration = 5000;
 
     private List<GeoPoint> mGeoPoints;
     private double distance;
@@ -86,7 +82,7 @@ public class AnimatedMapFragment extends Fragment {
     private TrackRideListener listener;
 
     public AnimatedMapFragment() {
-        // Required empty public constructor
+
     }
 
     public static AnimatedMapFragment newInstance(double startLat, double startLng, double endLat, double endLng) {
@@ -137,7 +133,7 @@ public class AnimatedMapFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_animated_map, container, false);
     }
 
@@ -189,16 +185,14 @@ public class AnimatedMapFragment extends Fragment {
                 Marker car = new Marker(map);
                 car.setPosition(mGeoPoints.get(mGeoPoints.size()-1));
                 car.setIcon(ContextCompat.getDrawable(requireContext(), R.drawable.car));
-                car.setInfoWindow(null);
                 map.getOverlays().add(car);
                 map.invalidate();
 
-                // --- ADD THIS BLOCK ---
-                // This is the trigger that tells DriverDashboard to change the text
+
                 if (listener != null) {
                     listener.OnArrivalAnimationCompleted();
                 }
-                // ----------------------
+
             }
         });
 
@@ -267,12 +261,12 @@ public class AnimatedMapFragment extends Fragment {
 
     private MilestoneManager getEndManager(Bitmap bitmap) {
         return new MilestoneManager(
-                new MilestoneMeterDistanceLister((int)Math.round(distance * 1000)), // Listen only at the total distance
+                new MilestoneMeterDistanceLister((int)Math.round(distance * 1000)),
                 new MilestoneBitmapDisplayer(0, true,
                         bitmap, bitmap.getWidth()/2, bitmap.getHeight()/2) {
                     @Override
                     protected void draw(Canvas pCanvas, Object pParameter) {
-                        // Only draw the end icon if the animation has finished
+
                         if (mAnimationEnded) {
                             super.draw(pCanvas, pParameter);
                         }

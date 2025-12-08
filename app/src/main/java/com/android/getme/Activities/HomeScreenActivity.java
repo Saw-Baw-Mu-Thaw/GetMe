@@ -181,7 +181,7 @@ public class HomeScreenActivity extends AppCompatActivity implements
 
         initializeListeners();
 
-        // Sets Home screen as default screen
+
         getSupportFragmentManager().beginTransaction().replace(R.id.homeScreenFragContainer, new HomeScreenFragment()).commit();
 
         requestPermissions();

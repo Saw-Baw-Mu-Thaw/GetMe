@@ -25,12 +25,12 @@ public class OfflineFragment extends Fragment {
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
 
-        // Find the view relative to the Fragment's root view
+
         CardView earningDisplay = view.findViewById(R.id.displayEarning);
 
         if (earningDisplay != null) {
             earningDisplay.setOnClickListener(v -> {
-                // Use getActivity() for the context
+
                 Intent intent = new Intent(getActivity(), DriverEarningActivity.class);
                 startActivity(intent);
             });
@@ -40,7 +40,7 @@ public class OfflineFragment extends Fragment {
 
         if (tripHistoryDisplay != null) {
             tripHistoryDisplay.setOnClickListener(v -> {
-                // Use getActivity() for the context
+
                 Intent intent = new Intent(getActivity(), TripHistoryActivity.class);
                 startActivity(intent);
             });

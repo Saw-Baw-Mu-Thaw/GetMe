@@ -18,12 +18,13 @@ public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.
     private List<RideRequestViewModel> rideList;
     private OnRideActionListener listener;
 
-    // Interface to pass the click event back to the Fragment
+
     public interface OnRideActionListener {
         void onAcceptClick(int rideId);
     }
 
-    // Updated Constructor to accept the listener
+
+
     public RideRequestAdapter(List<RideRequestViewModel> rideList, OnRideActionListener listener) {
         this.rideList = rideList;
         this.listener = listener;
@@ -47,7 +48,7 @@ public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.
         holder.tvPickup.setText(ride.getPickupLocation());
         holder.tvDropoff.setText(ride.getDropoffLocation());
 
-        // Handle Accept Button Click
+
         holder.btnAccept.setOnClickListener(v -> {
             if (listener != null) {
                 listener.onAcceptClick(ride.getRideId());
@@ -62,7 +63,7 @@ public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.
 
     public static class ViewHolder extends RecyclerView.ViewHolder {
         TextView tvName, tvRating, tvPrice, tvDistance, tvPickup, tvDropoff;
-        Button btnAccept; // Added Button
+        Button btnAccept;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -73,7 +74,7 @@ public class RideRequestAdapter extends RecyclerView.Adapter<RideRequestAdapter.
             tvPickup = itemView.findViewById(R.id.tvPickup);
             tvDropoff = itemView.findViewById(R.id.tvDropoff);
 
-            // Ensure your XML (ride_item_online.xml) has a Button with this ID
+
             btnAccept = itemView.findViewById(R.id.btnAccept);
         }
     }

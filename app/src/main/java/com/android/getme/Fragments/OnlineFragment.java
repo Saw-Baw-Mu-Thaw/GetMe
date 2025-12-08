@@ -36,7 +36,7 @@ public class OnlineFragment extends Fragment {
     private RideRequestAdapter adapter;
     private List<RideRequestViewModel> requests;
 
-    // Use 10.0.2.2 for Android Emulator
+
     private static final String BASE_URL = "http://10.0.2.2:8000";
     private int driverId;
 
@@ -54,7 +54,7 @@ public class OnlineFragment extends Fragment {
         requests = new ArrayList<>();
 
         adapter = new RideRequestAdapter(requests, rideId -> {
-            // Find the full ride object so we have the coordinates
+
             RideRequestViewModel selectedRide = findRideById(rideId);
             if (selectedRide != null) {
                 acceptRide(selectedRide);
@@ -66,7 +66,7 @@ public class OnlineFragment extends Fragment {
         return view;
     }
 
-    // Helper to find the object in our list
+
     private RideRequestViewModel findRideById(int rideId) {
         for (RideRequestViewModel r : requests) {
             if (r.getRideId() == rideId) return r;
@@ -89,7 +89,7 @@ public class OnlineFragment extends Fragment {
             for (int i = 0; i < response.length(); i++) {
                 JSONObject obj = response.getJSONObject(i);
 
-                // --- 1. Parse Basic Info ---
+
                 int rideId = obj.getInt("rideId");
                 int custId = obj.optInt("custId");
                 String pickup = obj.optString("LocationFrom", "Unknown");
@@ -97,7 +97,7 @@ public class OnlineFragment extends Fragment {
                 double amount = obj.optDouble("amount", 0.0);
                 double distance = obj.optDouble("distance", 0.0);
 
-                // --- 2. Parse Coordinates (from your API image) ---
+
                 double pickupLat = obj.optDouble("pickupLat", 0.0);
                 double pickupLng = obj.optDouble("pickupLong", 0.0);
                 double dropoffLat = obj.optDouble("dropoffLat", 0.0);
@@ -107,7 +107,7 @@ public class OnlineFragment extends Fragment {
                         rideId, "Customer #" + custId, "★ 5.0",
                          amount + " VND" , distance + " km",
                         pickup, dropoff,
-                        pickupLat, pickupLng, dropoffLat, dropoffLng // Pass coords
+                        pickupLat, pickupLng, dropoffLat, dropoffLng
                 ));
             }
             adapter.notifyDataSetChanged();
@@ -125,7 +125,7 @@ public class OnlineFragment extends Fragment {
                         String msg = response.getString("message");
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
 
-                        // --- 3. SWITCH TO MAP FRAGMENT ON SUCCESS ---
+
                         openMapFragment(ride);
 
                     } catch (JSONException e) {
@@ -137,14 +137,14 @@ public class OnlineFragment extends Fragment {
         VolleySingleton.getInstance(getContext()).addToRequestQueue(request);
     }
 
-    // Inside OnlineFragment.java
 
-    // Inside OnlineFragment.java
+
+
 
     private void openMapFragment(RideRequestViewModel ride) {
-        // Pass rideId (first argument)
+
         NavigationFragment navFragment = NavigationFragment.newInstance(
-                ride.getRideId(),         // <--- ADD THIS
+                ride.getRideId(),
                 ride.getPickupLat(),
                 ride.getPickupLng(),
                 ride.getDropoffLat(),

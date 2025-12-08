@@ -33,13 +33,13 @@ public class UserProfileFragment extends Fragment {
     private static final String KEY_GENDER = "gender";
     private static final String KEY_IS_PREMIUM = "isPremium";
 
-    // Views
+
     private TextView tvProfileUserName, tvProfileFullName, tvProfileEmail, tvProfilePhone;
     private Spinner spinnerGender;
     private ShapeableImageView ivProfilePicture;
     private MaterialButton btnProfileLogout;
 
-    private boolean isLoadingProfile = false; // Prevent saving during initial load
+    private boolean isLoadingProfile = false;
 
     public static UserProfileFragment newInstance() {
         return new UserProfileFragment();
@@ -63,7 +63,7 @@ public class UserProfileFragment extends Fragment {
         initViews(view);
         setupGenderSpinner();
         setupClickListeners();
-        loadUserProfile(); // First load
+        loadUserProfile();
     }
 
     @Override
@@ -89,11 +89,11 @@ public class UserProfileFragment extends Fragment {
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerGender.setAdapter(adapter);
 
-        // Save gender when user changes it
+
         spinnerGender.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-                // Don't save during initial load
+
                 if (!isLoadingProfile) {
                     String selectedGender = parent.getItemAtPosition(position).toString().toLowerCase();
                     saveGender(selectedGender);
@@ -102,7 +102,7 @@ public class UserProfileFragment extends Fragment {
 
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
-                // Do nothing
+
             }
         });
     }
@@ -116,7 +116,7 @@ public class UserProfileFragment extends Fragment {
 
 
     private void loadUserProfile() {
-        isLoadingProfile = true; // Prevent spinner from saving during load
+        isLoadingProfile = true;
 
         String fullName = sharedPreferences.getString("fullName", "User");
         String email = sharedPreferences.getString("email", "No email");
@@ -129,11 +129,11 @@ public class UserProfileFragment extends Fragment {
         tvProfileEmail.setText(email);
         tvProfilePhone.setText(phone);
 
-        // Gender - load saved value
+
         String gender = sharedPreferences.getString("gender", "male");
         Log.d("PROFILE_DEBUG", "Loading gender: '" + gender + "'");
 
-        int position = 0; // Default to Male
+        int position = 0;
         switch (gender.trim().toLowerCase()) {
             case "female":
                 position = 1;
