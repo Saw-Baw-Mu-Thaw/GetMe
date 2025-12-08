@@ -61,14 +61,14 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if(result.getResultCode() == RESULT_OK && result.getData() != null) {
-                        // TODO: set data for dropoff and driverId
+
                         Bundle b = result.getData().getExtras();
                         if(b != null) {
                             Intent intent = new Intent();
 
                             String status = b.getString("status");
                             intent.putExtra("status", status);
-                            // TODO : check status is cancelled
+
                             if(status.equals("Cancelled")) {
                                 setResult(RESULT_OK, intent);
                                 finish();
@@ -106,8 +106,6 @@ public class ChooseVehicleActivity extends AppCompatActivity {
         initializeComponents();
 
         setPrice();
-
-//        setChoice();
 
         initializeListeners();
     }
@@ -235,7 +233,7 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                         break;
                 }
 
-                viewModel.duration = ((int)duration) / 60; // we save in minutes
+                viewModel.duration = ((int)duration) / 60;
                 viewModel.distance = distance;
 
                 setChoice();
@@ -272,11 +270,9 @@ public class ChooseVehicleActivity extends AppCompatActivity {
                 if(road.mStatus == Road.STATUS_INVALID) {
                     WarningDialogFragment.newInstance("Status Invalid", "Road does not exist to those location")
                             .show(getSupportFragmentManager(), "Road Warning Dialog");
-//                    finish();
                 } else if(road.mStatus == Road.STATUS_TECHNICAL_ISSUE) {
                     WarningDialogFragment.newInstance("Technical Issues", "Location provider is having some issues.")
                             .show(getSupportFragmentManager(), "Road Warning Dialog");
-//                    finish();
                 } else if (road.mStatus == Road.STATUS_OK) {
                     Message msg = handler.obtainMessage();
                     Bundle bundle = new Bundle();

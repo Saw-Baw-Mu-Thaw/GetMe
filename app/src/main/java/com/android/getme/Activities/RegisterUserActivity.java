@@ -58,7 +58,7 @@ public class RegisterUserActivity extends AppCompatActivity {
     }
 
     private void attemptRegister() {
-        // Reset errors
+
         edtUserFullName.setError(null);
         edtUserEmail.setError(null);
         edtUserPhoneNo.setError(null);
@@ -74,7 +74,7 @@ public class RegisterUserActivity extends AppCompatActivity {
         boolean cancel = false;
         View focusView = null;
 
-        // Validate inputs
+
         if (TextUtils.isEmpty(fullname)) {
             edtUserFullName.setError("Full name is required");
             focusView = edtUserFullName;
@@ -123,7 +123,7 @@ public class RegisterUserActivity extends AppCompatActivity {
             return;
         }
 
-        // All good → send to server
+
         registerUser(fullname, email, phone, password);
     }
 
@@ -143,10 +143,10 @@ public class RegisterUserActivity extends AppCompatActivity {
 
         JsonObjectRequest request = new JsonObjectRequest(Request.Method.POST, url, jsonBody,
                 response -> {
-                    // SUCCESS → Show message and go back to Login
+
                     Toast.makeText(this, "Registration successful! Please log in.", Toast.LENGTH_LONG).show();
 
-                    // Just save profile data so when they DO login, profile shows correct info
+
                     getSharedPreferences("UserPrefs", MODE_PRIVATE)
                             .edit()
                             .putString("fullName", fullname)
@@ -156,7 +156,7 @@ public class RegisterUserActivity extends AppCompatActivity {
                             .putBoolean("isPremium", false)
                             .apply();
 
-                    // Go back to Login screen
+
                     Intent intent = new Intent(RegisterUserActivity.this, MainActivity.class);
                     intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
@@ -179,24 +179,24 @@ public class RegisterUserActivity extends AppCompatActivity {
     }
 
     private void saveUserSessionAndProfile(int custId, String fullname, String email, String phone) {
-        // Save to SESSION (for login state)
+
         getSharedPreferences("SESSION", MODE_PRIVATE)
                 .edit()
                 .putBoolean("loggedIn", true)
-                .putBoolean("isUser", true)  // true = customer/user
+                .putBoolean("isUser", true)
                 .putInt("userId", custId)
                 .putString("userName", fullname)
                 .putString("userEmail", email)
                 .putString("userPhone", phone)
                 .apply();
 
-        // Save to UserPrefs (for user profile screen)
+
         getSharedPreferences("UserPrefs", MODE_PRIVATE)
                 .edit()
                 .putString("fullName", fullname)
                 .putString("email", email)
                 .putString("phone", phone)
-                .putString("gender", "Male") // Default
+                .putString("gender", "Male")
                 .putBoolean("isPremium", false)
                 .apply();
     }

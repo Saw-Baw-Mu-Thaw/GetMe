@@ -10,7 +10,6 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
@@ -20,11 +19,8 @@ import android.view.ViewGroup;
 
 import com.android.getme.Adapters.CustHistoryAdapter;
 import com.android.getme.Models.CustRideHistoryResult;
-import com.android.getme.Others.DummyData;
 import com.android.getme.R;
-import com.android.getme.ViewModels.CustHistoryViewModel;
 import com.android.volley.NetworkResponse;
-import com.android.volley.ParseError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -34,15 +30,7 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.google.gson.Gson;
 
-import java.io.BufferedInputStream;
-import java.io.DataInputStream;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.io.Reader;
-import java.io.UnsupportedEncodingException;
-import java.lang.reflect.Method;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
 import java.util.Arrays;
 
 public class HistoryTabFragment extends Fragment {
@@ -51,7 +39,7 @@ public class HistoryTabFragment extends Fragment {
 
 
     public HistoryTabFragment() {
-        // Required empty public constructor
+
     }
 
 
@@ -66,7 +54,7 @@ public class HistoryTabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_history_tab, container, false);
     }
 

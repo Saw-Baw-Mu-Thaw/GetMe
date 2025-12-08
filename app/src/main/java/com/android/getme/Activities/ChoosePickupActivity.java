@@ -35,6 +35,7 @@ import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowInsetsCompat;
@@ -104,7 +105,7 @@ public class ChoosePickupActivity extends AppCompatActivity
                 @Override
                 public void onActivityResult(ActivityResult result) {
                     if (result.getResultCode() == RESULT_OK) {
-                        // TODO: set data for dropoff, driverId, vehicleType, payment and rideId
+
                         if (result.getData() != null) {
                             Bundle b = result.getData().getExtras();
                             if (b != null) {
@@ -116,7 +117,7 @@ public class ChoosePickupActivity extends AppCompatActivity
                                     setResult(RESULT_OK, intent);
                                     finish();
                                 }
-                                // TODO : check if status is cancelled
+
 
                                 int rideId = b.getInt("rideId");
                                 int driverId = b.getInt("driverId");
@@ -159,7 +160,7 @@ public class ChoosePickupActivity extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_choose_pickup);
 
-        // Needed for OSM to work
+
         userAgent = ActivityCompat.getString(this, R.string.GetMe_OSM_User_Agent);
         Configuration.getInstance().setUserAgentValue(userAgent);
 
@@ -169,17 +170,16 @@ public class ChoosePickupActivity extends AppCompatActivity
         viewModel.custId = getIntent().getExtras().getInt("custId");
 
 
-        // checking and requesting permission
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            WarningDialogFragment.newInstance("Permission Error", "Location permission required for ride finding to work.")
-                            .show(getSupportFragmentManager(), "Permisssion Warning Dialog");
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            Toast.makeText(this, "Location permission required for ride finding to work.", Toast.LENGTH_SHORT).show();
             finish();
         }
 
         initializeViewComponents();
 
         FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-        // if you see an error ignore it, the locationPermissionGranted already checks for location permission
+
         fusedLocationClient.getLastLocation().addOnSuccessListener(new OnSuccessListener<Location>() {
             @Override
             public void onSuccess(Location location) {
@@ -203,7 +203,7 @@ public class ChoosePickupActivity extends AppCompatActivity
                             if(locationResult == null) {
                                 return;
                             }
-                            onSuccess(locationResult.getLocations().get(-1));
+                            onSuccess(locationResult.getLastLocation());
                         }
                     };
                     try{
@@ -227,11 +227,11 @@ public class ChoosePickupActivity extends AppCompatActivity
     }
 
     private void initializeListeners() {
-        // setting listeners
+
         pickupBackLinlay.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                // add result data in here if any
+
                 finish();
             }
         });
@@ -251,7 +251,7 @@ public class ChoosePickupActivity extends AppCompatActivity
                 map.getOverlays().add(pickupMarker);
                 map.invalidate();
 
-                // start pick dropoff activity
+
                 launchDropoffActivity();
             }
         });
@@ -260,14 +260,14 @@ public class ChoosePickupActivity extends AppCompatActivity
             @Override
             public boolean onEditorAction(TextView textView, int i, KeyEvent keyEvent) {
                 if (i == EditorInfo.IME_ACTION_DONE || i == EditorInfo.IME_ACTION_SEARCH) {
-//                    Toast.makeText(ChoosePickupActivity.this, pickupSearchEditText.getText(), Toast.LENGTH_SHORT).show();
+
 
                     RequestQueue queue = Volley.newRequestQueue(ChoosePickupActivity.this);
                     String url = "https://graphhopper.com/api/1/geocode?";
                     String q = "q=" + pickupSearchEditText.getText();
                     String key = "key=" + ActivityCompat.getString(ChoosePickupActivity.this, R.string.GH_key);
                     String limit = "limit=" + 3;
-                    String point = "&point=10.8231,106.6297"; // to bias ho chi minh city
+                    String point = "&point=10.8231,106.6297";
                     url = url + q + "&" + key + "&" + limit + point;
 
                     StringRequest stringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
@@ -280,7 +280,7 @@ public class ChoosePickupActivity extends AppCompatActivity
                     }, new Response.ErrorListener() {
                         @Override
                         public void onErrorResponse(VolleyError volleyError) {
-                            // do nothing yet
+
                             Log.e("Volley Error", volleyError.toString());
                         }
                     });
@@ -293,7 +293,7 @@ public class ChoosePickupActivity extends AppCompatActivity
     }
 
     private void setCurrentLocationAddress() {
-        // gets the current address for current location
+
         Handler handler = new Handler(Looper.getMainLooper()) {
             @Override
             public void handleMessage(@NonNull Message msg) {
@@ -379,7 +379,7 @@ public class ChoosePickupActivity extends AppCompatActivity
         viewModel.pickupName = name;
         viewModel.pickupAddress = address;
         adapter.setSearchResults(new ArrayList<>());
-        // start new activity
+
         launchDropoffActivity();
     }
 

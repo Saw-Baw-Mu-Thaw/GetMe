@@ -431,7 +431,7 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
 
                 webSocket.close(1000, "Client initiated close");
                 client.dispatcher().executorService().shutdown();
-                // show complete activity
+
                 Intent intent = new Intent(TrackRideActivity.this, RideCompleteActivity.class);
                 intent.putExtra("rideId", mViewModel.rideId);
                 intent.putExtra("name", driverName);
@@ -442,7 +442,6 @@ public class TrackRideActivity extends AppCompatActivity implements TrackRideLis
                 intent.putExtra("total", trackRideTotalCostTextView.getText().toString());
                 intent.putExtra("payment", mViewModel.payment);
                 intent.putExtra("rating", averageRating);
-                        // also include rating
                 startForResult.launch(intent);
             }
 

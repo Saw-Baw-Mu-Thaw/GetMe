@@ -60,7 +60,7 @@ public class OngoingTabFragment extends Fragment {
 
 
     public OngoingTabFragment() {
-        // Required empty public constructor
+
     }
 
     public static OngoingTabFragment newInstance(int custId, String vehicleType) {
@@ -91,7 +91,7 @@ public class OngoingTabFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
+
         return inflater.inflate(R.layout.fragment_ongoing_tab, container, false);
     }
 

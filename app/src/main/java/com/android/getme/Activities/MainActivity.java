@@ -40,7 +40,7 @@ public class MainActivity extends AppCompatActivity {
 
         sp = getSharedPreferences("SESSION", MODE_PRIVATE);
 
-        // Auto login if already logged in
+
         if (sp.getBoolean("loggedIn", false)) {
             launchCorrectHomeScreen();
             return;
@@ -115,10 +115,10 @@ public class MainActivity extends AppCompatActivity {
                     try {
                         int userId = isUser ? response.getInt("custId") : response.getInt("driverId");
 
-                        // Save session first
+
                         saveSession(userId, isUser);
 
-                        // Now fetch full profile from server
+
                         fetchUserProfile(userId, isUser);
 
                     } catch (JSONException e) {
@@ -144,7 +144,7 @@ public class MainActivity extends AppCompatActivity {
         Volley.newRequestQueue(this).add(request);
     }
 
-    // FIXED: Fetch profile for both User and Driver
+
     private void fetchUserProfile(int userId, boolean isCustomer) {
         String url = isCustomer
                 ? BASE_URL + "/profile/customer?custId=" + userId
@@ -166,7 +166,7 @@ public class MainActivity extends AppCompatActivity {
 
                     } catch (JSONException e) {
                         Log.e("PROFILE", "Error parsing profile", e);
-                        // Still launch even if profile parsing fails
+
                         Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
                         btnLogin.setEnabled(true);
                         btnLogin.setText("Login");
@@ -175,7 +175,7 @@ public class MainActivity extends AppCompatActivity {
                 },
                 error -> {
                     Log.e("PROFILE", "Failed to load profile", error);
-                    // Still launch even if profile fetch fails
+
                     Toast.makeText(this, "Login successful!", Toast.LENGTH_SHORT).show();
                     btnLogin.setEnabled(true);
                     btnLogin.setText("Login");
@@ -186,7 +186,7 @@ public class MainActivity extends AppCompatActivity {
         Volley.newRequestQueue(this).add(request);
     }
 
-    // Save customer profile to UserPrefs
+
     private void saveCustomerProfile(JSONObject response) throws JSONException {
         SharedPreferences prefs = getSharedPreferences("UserPrefs", MODE_PRIVATE);
 
@@ -198,7 +198,7 @@ public class MainActivity extends AppCompatActivity {
         editor.putString("email", response.getString("email"));
         editor.putString("phone", response.getString("phone"));
 
-        // Use backend gender if available, otherwise keep existing
+
         String genderFromBackend = response.optString("gender", "");
         if (genderFromBackend.isEmpty() || genderFromBackend.trim().isEmpty()) {
             editor.putString("gender", existingGender);
@@ -219,7 +219,7 @@ public class MainActivity extends AppCompatActivity {
 
         SharedPreferences.Editor editor = prefs.edit();
 
-        // Personal Information
+
         editor.putString("fullName", response.getString("fullname"));
         editor.putString("email", response.getString("email"));
         editor.putString("phone", response.getString("phone"));
@@ -231,13 +231,13 @@ public class MainActivity extends AppCompatActivity {
             editor.putString("gender", genderFromBackend);
         }
 
-        // Vehicle Information
+
         editor.putString("vehicleModel", response.optString("make", "Not set"));
         editor.putString("licensePlate", response.optString("license", "Not set"));
         editor.putString("vehicleColor", response.optString("color", "Not set"));
         editor.putString("vehicleType", response.optString("vehicleType", "Car"));
 
-        // Statistics
+
         editor.putInt("totalRides", response.optInt("totalRides", 0));
         editor.putInt("acceptanceRate", response.optInt("acceptanceRate", 100));
         editor.putBoolean("isPremium", response.optBoolean("isPremium", false));

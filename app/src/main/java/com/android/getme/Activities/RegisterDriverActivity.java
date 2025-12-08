@@ -33,7 +33,7 @@ public class RegisterDriverActivity extends AppCompatActivity {
     private TextView tvCar, tvBike, tvDriverSignin;
 
     private LinearLayout linearlayoutBike, linearlayoutCar;
-    private String selectedVehicleType = "Car"; // Default
+    private String selectedVehicleType = "Car";
 
     private static final String BASE_URL = "http://10.0.2.2:8000";
 
@@ -164,7 +164,7 @@ public class RegisterDriverActivity extends AppCompatActivity {
             json.put("license", license);
             json.put("color", color);
             json.put("earning", 0);
-            // "gender" field removed completely
+
         } catch (JSONException e) {
             e.printStackTrace();
         }

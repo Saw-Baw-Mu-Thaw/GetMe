@@ -25,15 +25,15 @@ public class NavigationFragment extends Fragment {
     private TextView tvStatus;
     private Button btnArrived;
 
-    // Data Fields
+
     private int rideId;
     private double pickupLat, pickupLng, dropoffLat, dropoffLng;
-    private boolean isDropoffPhase = false; // Tracks if we are in Phase 2
+    private boolean isDropoffPhase = false;
 
 
     private final double driverLat = 10.740897;
     private final double driverLng = 106.695322;
-    // Use 10.0.2.2 for Android Emulator
+
     private static final String BASE_URL = "http://10.0.2.2:8000";
 
     public NavigationFragment() { }
@@ -69,14 +69,14 @@ public class NavigationFragment extends Fragment {
         if (getArguments() != null) {
             rideId = getArguments().getInt("rideId");
 
-            // Phase 1: Driver (Start) -> Pickup (End)
+
             pickupLat = getArguments().getDouble("startLat");
             pickupLng = getArguments().getDouble("startLng");
-            // Phase 2: Pickup (Start) -> Dropoff (End)
+
             dropoffLat = getArguments().getDouble("endLat");
             dropoffLng = getArguments().getDouble("endLng");
 
-            // Populate UI
+
             ((TextView)view.findViewById(R.id.tvNavName)).setText(getArguments().getString("name"));
             ((TextView)view.findViewById(R.id.tvNavRating)).setText(getArguments().getString("rating"));
             ((TextView)view.findViewById(R.id.tvNavPickup)).setText(getArguments().getString("pickup"));
@@ -111,7 +111,7 @@ public class NavigationFragment extends Fragment {
         }
     }
 
-    // Called by DriverDashboard when animation ends
+
     public void enableArrivalButton() {
         if (btnArrived == null) return;
 
@@ -119,19 +119,19 @@ public class NavigationFragment extends Fragment {
         btnArrived.setAlpha(1.0f);
 
         if (!isDropoffPhase) {
-            // PHASE 1 DONE: Ready to Arrive
+
             btnArrived.setText("Start Ride");
-            btnArrived.setBackgroundColor(Color.parseColor("#2563EB")); // Blue
+            btnArrived.setBackgroundColor(Color.parseColor("#2563EB"));
             btnArrived.setOnClickListener(v -> callArrivalEndpoint());
         } else {
-            // PHASE 2 DONE: Ready to Complete
+
             btnArrived.setText("Complete Ride");
-            btnArrived.setBackgroundColor(Color.parseColor("#10B981")); // Green
-            btnArrived.setOnClickListener(v -> callCompleteRideEndpoint()); // <--- NEW CALL
+            btnArrived.setBackgroundColor(Color.parseColor("#10B981"));
+            btnArrived.setOnClickListener(v -> callCompleteRideEndpoint());
         }
     }
 
-    // --- API 1: Mark Arrival ---
+
     private void callArrivalEndpoint() {
         String url = BASE_URL + "/ride/arrival/" + rideId;
 
@@ -141,7 +141,7 @@ public class NavigationFragment extends Fragment {
                         String msg = response.getString("message");
                         Toast.makeText(getContext(), msg, Toast.LENGTH_SHORT).show();
 
-                        // Start Phase 2 logic locally
+
                         startDropoffPhase();
 
                     } catch (JSONException e) { e.printStackTrace(); }
@@ -151,7 +151,7 @@ public class NavigationFragment extends Fragment {
         VolleySingleton.getInstance(getContext()).addToRequestQueue(request);
     }
 
-    // --- API 2: Complete Ride ---
+
     private void callCompleteRideEndpoint() {
         String url = BASE_URL + "/ride/complete/" + rideId;
 
@@ -161,7 +161,7 @@ public class NavigationFragment extends Fragment {
                         String msg = response.getString("message");
                         Toast.makeText(getContext(), msg, Toast.LENGTH_LONG).show();
 
-                        // SUCCESS: Close Navigation and return to Dashboard
+
                         requireActivity().getSupportFragmentManager().popBackStack();
 
                     } catch (JSONException e) { e.printStackTrace(); }
@@ -171,7 +171,7 @@ public class NavigationFragment extends Fragment {
         VolleySingleton.getInstance(getContext()).addToRequestQueue(request);
     }
 
-    // --- Transition Logic ---
+
     private void startDropoffPhase() {
         isDropoffPhase = true;
 
@@ -181,7 +181,7 @@ public class NavigationFragment extends Fragment {
         btnArrived.setAlpha(0.5f);
         btnArrived.setText("Driving to Dropoff...");
 
-        // Load Map: Pickup -> Dropoff
+
         loadMap(pickupLat, pickupLng, dropoffLat, dropoffLng);
     }
 }
